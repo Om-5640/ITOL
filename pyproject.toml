@@ -10,7 +10,10 @@ requires-python = ">=3.11"
 dependencies = []   # runtime deps added per build step
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "pytest-cov"]
+dev = ["pytest>=8.0", "pytest-cov", "numpy>=1.24"]
+embed = ["numpy>=1.24", "onnxruntime>=1.17", "huggingface-hub>=0.20", "transformers>=4.38"]
+embed-st = ["numpy>=1.24", "sentence-transformers>=2.7"]
+telemetry = ["prometheus-client>=0.19"]
 
 [tool.setuptools.packages.find]
 where = ["."]

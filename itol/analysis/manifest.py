@@ -433,11 +433,12 @@ def extract_manifest(icr: ICR) -> ConstraintManifest:
             items.extend(_extract_normative_clauses(seg.text, sents, seg.segment_hash))
         items.extend(_extract_format_specifiers(seg.text, sents, seg.segment_hash))
 
-    # Query terms from the final user query
+    # Query terms from the final user query.
+    # Use instruction_sents (full context) so polarity_intact sees the same
+    # sentence boundaries as governing_span computation did here.
     query = icr.final_user_query()
     if query:
-        query_sents = split_sentences(query)
-        items.extend(_extract_query_terms(query, query_sents or [query]))
+        items.extend(_extract_query_terms(query, instruction_sents or split_sentences(query)))
 
     # De-duplicate by (item_type, value) — keep first occurrence
     seen_keys: set[tuple] = set()

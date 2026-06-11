@@ -466,3 +466,4 @@ class ICRResponse:
     finish_reason: str | None = None
     raw: dict[str, Any] = field(default_factory=dict)
     latency_ms: float = 0.0
+    error: str | None = None          # non-None → error/refusal; must not be cached (CR-20)
