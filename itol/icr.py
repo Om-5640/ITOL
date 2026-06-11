@@ -11,6 +11,8 @@ beyond the standard library so it can be imported in any environment.
 
 from __future__ import annotations
 
+import hashlib
+import re
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
@@ -200,9 +202,91 @@ class ClassifierResult:
             self.ambiguous = True
 
 
+# ---------------------------------------------------------------------------
+# §15.1 — Relation-aware manifest checking constants
+# ---------------------------------------------------------------------------
+
+# Qualifier tokens from data/qualifiers.txt (hardcoded here so icr.py stays
+# dependency-free; the manifest extractor also loads the file for extensibility).
+_QUALIFIER_TOKENS: frozenset[str] = frozenset({
+    "projected", "estimated", "not", "except", "only",
+    "excluding", "before", "after", "assuming", "unless",
+    "approximately", "pending", "assumed",
+    # multi-word qualifiers (checked as substrings)
+    "as of", "up to", "at most", "at least", "subject to",
+})
+
+# Negation / modality tokens for polarity_guard (§15.1).
+_NEGATION_MODALITY: frozenset[str] = frozenset({
+    "not", "never", "no", "neither", "nor", "cannot", "can't", "won't",
+    "wouldn't", "shouldn't", "isn't", "aren't", "wasn't", "weren't",
+    "don't", "doesn't", "didn't", "hardly", "rarely", "seldom",
+    "projected", "estimated", "approximately", "pending", "assumed",
+    "subject to",
+})
+
+# Coreference pronouns that extend the governing span (§15.1).
+# "the" is omitted: as a generic determiner it appears in virtually every sentence
+# and cannot signal true coreference without full NLP; the spec's intent is
+# anaphoric reference (it, they, this, that …), not bare article use.
+_COREF_TOKENS: frozenset[str] = frozenset({
+    "it", "its", "they", "their", "this", "that", "these", "those",
+})
+
+_SENT_BOUNDARY = re.compile(r"(?<=[.!?])\s+|\n+")
+
+
+def _split_for_coverage(text: str) -> list[str]:
+    """Minimal sentence splitter used for CR-21 coverage checks."""
+    parts = _SENT_BOUNDARY.split(text)
+    return [p.strip() for p in parts if p.strip()]
+
+
+def _qualifier_tokens_in_span(span: str) -> list[str]:
+    """Return qualifier tokens present in a governing_span (for CR-21 checks)."""
+    lower = span.lower()
+    found: list[str] = []
+    for token in _QUALIFIER_TOKENS:
+        if " " in token:
+            if token in lower:
+                found.append(token)
+        elif re.search(r"\b" + re.escape(token) + r"\b", lower):
+            found.append(token)
+    return found
+
+
+def _qualifiers_survive(item_value: str, governing_span: str, opt_text: str) -> bool:
+    """
+    CR-21: all qualifier tokens from governing_span must appear within
+    ±1 sentence of item_value in opt_text.
+    """
+    qualifier_tokens = _qualifier_tokens_in_span(governing_span)
+    if not qualifier_tokens:
+        return True
+
+    sents = _split_for_coverage(opt_text)
+    item_idx: int | None = None
+    for i, s in enumerate(sents):
+        if item_value in s:
+            item_idx = i
+            break
+    if item_idx is None:
+        return False
+
+    lo, hi = max(0, item_idx - 1), min(len(sents), item_idx + 2)
+    window = " ".join(sents[lo:hi]).lower()
+    for qt in qualifier_tokens:
+        if " " in qt:
+            if qt not in window:
+                return False
+        elif not re.search(r"\b" + re.escape(qt) + r"\b", window):
+            return False
+    return True
+
+
 @dataclass
 class ManifestItem:
-    """A single entry in the Constraint Manifest (§5.1)."""
+    """A single entry in the Constraint Manifest (§5.1 + §15.1)."""
     class ItemType(str, Enum):
         ENTITY     = "entity"
         NUMBER     = "number"
@@ -211,14 +295,17 @@ class ManifestItem:
         QUERY_TERM = "query_term"  # content words of the final user query
 
     item_type: "ManifestItem.ItemType"
-    value: str                     # exact text that must survive optimisation
+    value: str                          # exact text that must survive optimisation
     source_segment_hash: str | None = None
+    # §15.1 relation-aware fields
+    governing_span: str = ""            # ±1-sentence qualifier window (§15.1)
+    polarity_guard: str = ""            # sha256 of negation/modality tokens in governing_span
 
 
 @dataclass
 class ConstraintManifest:
     """
-    Machine-checkable losslessness contract extracted from the original prompt (§5.1).
+    Machine-checkable losslessness contract extracted from the original prompt (§5.1 + §15.1).
 
     coverage(optimised_prompt) must equal 1.0 before dispatch.
     """
@@ -226,10 +313,25 @@ class ConstraintManifest:
     source_token_count: int = 0
 
     def coverage(self, optimised_text: str) -> float:
-        """Fraction of manifest items findable in optimised_text."""
+        """
+        Fraction of manifest items fully preserved in optimised_text.
+
+        CR-21: an item is 'found' only if BOTH its value AND the qualifier
+        tokens from its governing_span survive within ±1 sentence of each
+        other in optimised_text.  Items with empty governing_span fall back
+        to the plain value-presence check (backward-compatible).
+        """
         if not self.items:
             return 1.0
-        found = sum(1 for item in self.items if item.value in optimised_text)
+        found = 0
+        for item in self.items:
+            if item.value not in optimised_text:
+                continue
+            if item.governing_span and not _qualifiers_survive(
+                item.value, item.governing_span, optimised_text
+            ):
+                continue
+            found += 1
         return found / len(self.items)
 
 

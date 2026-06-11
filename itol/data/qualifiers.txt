@@ -1,0 +1,21 @@
+# §15.1 qualifier lexicon — one token or phrase per line.
+# These tokens, when found in ±1-sentence neighbors of a manifest item,
+# cause those sentences to be included in the item's governing_span.
+# Multi-word phrases are matched as substrings of the lowercased sentence.
+projected
+estimated
+not
+except
+only
+as of
+excluding
+before
+after
+assuming
+unless
+approximately
+up to
+at most
+at least
+pending
+subject to
