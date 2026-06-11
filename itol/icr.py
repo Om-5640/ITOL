@@ -181,10 +181,11 @@ class SegmentSignals:
 @dataclass
 class ClassifierResult:
     """Output of the request-type classifier (§3.4)."""
-    primary: str                 # one of the 8 class names
+    primary: str                        # one of the 8 class names
     distribution: dict[str, float] = field(default_factory=dict)
-    confidence: float = 0.0      # max probability; <0.6 → AMBIGUOUS routing
+    confidence: float = 0.0             # max probability; <0.6 → AMBIGUOUS routing
     ambiguous: bool = False
+    top2: list[str] = field(default_factory=list)  # top-2 classes for AMBIGUOUS routing (§3.4)
 
     REQUEST_CLASSES: tuple[str, ...] = field(default=(
         "EXTRACTION",
@@ -344,8 +345,11 @@ class StrategyReport:
     strategy_id: str          # "S1", "S2", …, "S7"
     tokens_removed: int = 0
     risk_class: str = "LOSSLESS"  # "LOSSLESS" | "NEAR-LOSSLESS" | "LOSSY-BOUNDED" | "LOSSY-AGGRESSIVE"
-    manifest_touches: list[str] = field(default_factory=list)  # hashes of touched segments
-    segment_snapshot: list[Any] | None = None  # copy of segment list BEFORE this strategy ran
+    manifest_touches: list[str] = field(default_factory=list)   # hashes of touched segments (legacy alias)
+    segment_snapshot: list[Any] | None = None                   # segment list BEFORE this strategy ran
+    # CR-14.2: precise mutation provenance used by rollback
+    touched_segments: list[str] = field(default_factory=list)   # hashes of every segment mutated/removed
+    removed_spans: list[tuple[int, int]] = field(default_factory=list)  # (start, end) char offsets removed
 
 
 @dataclass
