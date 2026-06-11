@@ -343,13 +343,21 @@ class StrategyReport:
     for per-segment rollback.
     """
     strategy_id: str          # "S1", "S2", …, "S7"
-    tokens_removed: int = 0
-    risk_class: str = "LOSSLESS"  # "LOSSLESS" | "NEAR-LOSSLESS" | "LOSSY-BOUNDED" | "LOSSY-AGGRESSIVE"
+    tokens_removed: int = 0   # backward-compat alias for tokens_saved
+    risk_class: str = "LOSSLESS"  # "LOSSLESS" | "NEAR_LOSSLESS" | "LOSSY_BOUNDED" | "LOSSY_AGGRESSIVE"
     manifest_touches: list[str] = field(default_factory=list)   # hashes of touched segments (legacy alias)
     segment_snapshot: list[Any] | None = None                   # segment list BEFORE this strategy ran
     # CR-14.2: precise mutation provenance used by rollback
     touched_segments: list[str] = field(default_factory=list)   # hashes of every segment mutated/removed
     removed_spans: list[tuple[int, int]] = field(default_factory=list)  # (start, end) char offsets removed
+    # Phase 2 fields (strategies/base.py)
+    tokens_before: int = 0
+    tokens_after: int = 0
+    tokens_saved: int = 0
+    prefix_bytes_mutated: int = 0
+    prefix_savings: int = 0
+    activated: bool = False
+    notes: str = ""
 
 
 @dataclass

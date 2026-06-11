@@ -1,0 +1,25 @@
+# ITOL filler patterns — §4 S2 instruction hygiene
+# Format: <regex_pattern>\t<replacement>
+# Applied to SYSTEM_INSTRUCTION segments only.
+# Normative-token guard (must/never/always/etc.) is enforced at runtime.
+#
+# Patterns use Python re syntax (case-insensitive matching).
+Please make sure (that )?you (always )?
+Please ensure (that )?
+It is important (that )?you (always )?
+Please note that\tNote:
+Feel free to\t
+As an AI (assistant|language model|chatbot),?\s*
+I('d| would) like you to\t
+Your task is to\t
+In order to\t
+You should always\tAlways
+You must always\tAlways
+Make sure (that )?to\t
+Be sure (that )?to\t
+Please (be aware|note)\s+(that\s+)?
+It('s| is) worth noting that\t
+I want you to\t
+You are (going to|here to|tasked to|supposed to)\t
+You will need to\t
+I('m| am) going to (need|ask) you to\t
