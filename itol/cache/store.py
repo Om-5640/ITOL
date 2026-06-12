@@ -149,6 +149,19 @@ CREATE TABLE IF NOT EXISTS circuit_state (
     disabled         INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (strategy_id, request_class, tenant_id)
 );
+
+CREATE TABLE IF NOT EXISTS breakeven_log (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts           REAL NOT NULL,
+    r_reuses     INTEGER NOT NULL,
+    delta_t      INTEGER NOT NULL,
+    p_in_disc    REAL NOT NULL,
+    c_opt        REAL NOT NULL,
+    lhs          REAL NOT NULL,
+    rhs          REAL NOT NULL,
+    passed       INTEGER NOT NULL,
+    context_json TEXT
+);
 """
 
 
@@ -632,3 +645,102 @@ class Store:
             ),
         )
         self._conn().commit()
+
+    # ------------------------------------------------------------------
+    # Break-even logging  (CR-15)
+    # ------------------------------------------------------------------
+
+    def log_breakeven(
+        self,
+        r_reuses: int,
+        delta_t: int,
+        p_in_disc: float,
+        c_opt: float,
+        lhs: float,
+        rhs: float,
+        passed: bool,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        """CR-15: every call to breakeven_check must be persisted."""
+        self._conn().execute(
+            """INSERT INTO breakeven_log
+               (ts, r_reuses, delta_t, p_in_disc, c_opt, lhs, rhs, passed, context_json)
+               VALUES (?,?,?,?,?,?,?,?,?)""",
+            (
+                time.time(), r_reuses, delta_t, p_in_disc, c_opt,
+                lhs, rhs, int(passed),
+                json.dumps(context) if context is not None else None,
+            ),
+        )
+        self._conn().commit()
+
+    def get_breakeven_log(self, limit: int = 100) -> list[dict[str, Any]]:
+        """Return the most recent breakeven log entries (newest first)."""
+        rows = self._conn().execute(
+            "SELECT ts, r_reuses, delta_t, p_in_disc, c_opt, lhs, rhs, passed, context_json "
+            "FROM breakeven_log ORDER BY id DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+        return [
+            {
+                "ts": r[0], "r_reuses": r[1], "delta_t": r[2],
+                "p_in_disc": r[3], "c_opt": r[4], "lhs": r[5],
+                "rhs": r[6], "passed": bool(r[7]),
+                "context": json.loads(r[8]) if r[8] else None,
+            }
+            for r in rows
+        ]
+
+    # ------------------------------------------------------------------
+    # Docs — extra helpers for S4 RACR
+    # ------------------------------------------------------------------
+
+    def get_docs_for_conversation(
+        self, tenant_id: str, conversation_id: str
+    ) -> list[dict[str, Any]]:
+        """Return all docs stored for (tenant_id, conversation_id)."""
+        rows = self._conn().execute(
+            "SELECT doc_hash, content, version_hash FROM docs "
+            "WHERE tenant_id=? AND conversation_id=?",
+            (tenant_id, conversation_id),
+        ).fetchall()
+        return [{"doc_hash": r[0], "content": r[1], "version_hash": r[2]} for r in rows]
+
+    # ------------------------------------------------------------------
+    # Template helpers  (S2-LLM)
+    # ------------------------------------------------------------------
+
+    def get_template(
+        self, template_sig: str, tenant_id: str
+    ) -> dict[str, Any] | None:
+        """Return template row or None if not found."""
+        row = self._conn().execute(
+            "SELECT reuse_count, last_seen, compressed_instruction, compression_verified "
+            "FROM templates WHERE template_sig=? AND tenant_id=?",
+            (template_sig, tenant_id),
+        ).fetchone()
+        if not row:
+            return None
+        return {
+            "reuse_count": row[0],
+            "last_seen": row[1],
+            "compressed_instruction": row[2],
+            "compression_verified": bool(row[3]),
+        }
+
+    def set_template_compressed(
+        self,
+        template_sig: str,
+        tenant_id: str,
+        compressed_instruction: str,
+        verified: bool,
+    ) -> None:
+        """Store the LLM-rewritten instruction and mark it as verified (or not)."""
+        conn = self._conn()
+        conn.execute(
+            """UPDATE templates
+               SET compressed_instruction=?, compression_verified=?
+               WHERE template_sig=? AND tenant_id=?""",
+            (compressed_instruction, int(verified), template_sig, tenant_id),
+        )
+        conn.commit()
