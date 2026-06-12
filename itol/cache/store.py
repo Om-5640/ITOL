@@ -98,6 +98,29 @@ CREATE TABLE IF NOT EXISTS conversations (
     updated_at      REAL NOT NULL,
     PRIMARY KEY (conversation_id, tenant_id)
 );
+
+CREATE TABLE IF NOT EXISTS l1_cache (
+    entry_id         TEXT NOT NULL,
+    namespace        TEXT NOT NULL,
+    response_json    TEXT NOT NULL,
+    query_text       TEXT NOT NULL DEFAULT '',
+    manifest_numbers TEXT NOT NULL DEFAULT '[]',
+    tokens_saved     INTEGER NOT NULL DEFAULT 0,
+    last_access_1    REAL NOT NULL DEFAULT 0,
+    last_access_2    REAL NOT NULL DEFAULT 0,
+    created_at       REAL NOT NULL,
+    PRIMARY KEY (entry_id, namespace)
+);
+CREATE INDEX IF NOT EXISTS idx_l1_cache_ns ON l1_cache (namespace);
+
+CREATE TABLE IF NOT EXISTS l2_plans (
+    template_sig           TEXT NOT NULL,
+    tenant_id              TEXT NOT NULL,
+    plan_json              TEXT NOT NULL,
+    depends_on_doc_versions TEXT NOT NULL DEFAULT '[]',
+    created_at             REAL NOT NULL,
+    PRIMARY KEY (template_sig, tenant_id)
+);
 """
 
 
@@ -308,3 +331,134 @@ class Store:
             ),
         )
         conn.commit()
+
+    # ------------------------------------------------------------------
+    # L1 semantic cache (§6.1)
+    # ------------------------------------------------------------------
+
+    def get_l1_entry(self, entry_id: str, namespace: str) -> dict[str, Any] | None:
+        row = self._conn().execute(
+            "SELECT entry_id, namespace, response_json, query_text, manifest_numbers, tokens_saved "
+            "FROM l1_cache WHERE entry_id=? AND namespace=?",
+            (entry_id, namespace),
+        ).fetchone()
+        return dict(row) if row else None
+
+    def set_l1_entry(
+        self,
+        entry_id: str,
+        namespace: str,
+        response_json: str,
+        query_text: str,
+        manifest_numbers_json: str,
+        tokens_saved: int = 0,
+    ) -> None:
+        now = time.time()
+        self._conn().execute(
+            """INSERT OR REPLACE INTO l1_cache
+               (entry_id, namespace, response_json, query_text, manifest_numbers,
+                tokens_saved, last_access_1, last_access_2, created_at)
+               VALUES (?,?,?,?,?,?,?,?,?)""",
+            (entry_id, namespace, response_json, query_text,
+             manifest_numbers_json, tokens_saved, now, now, now),
+        )
+        self._conn().commit()
+
+    def update_l1_access(self, entry_id: str, namespace: str, now: float) -> None:
+        conn = self._conn()
+        conn.execute(
+            "UPDATE l1_cache SET last_access_1 = last_access_2, last_access_2 = ? "
+            "WHERE entry_id=? AND namespace=?",
+            (now, entry_id, namespace),
+        )
+        conn.commit()
+
+    def delete_l1_entry(self, entry_id: str, namespace: str) -> None:
+        conn = self._conn()
+        conn.execute("DELETE FROM l1_cache WHERE entry_id=? AND namespace=?", (entry_id, namespace))
+        conn.commit()
+
+    def count_l1_entries(self, namespace: str | None = None) -> int:
+        if namespace is not None:
+            row = self._conn().execute(
+                "SELECT COUNT(*) FROM l1_cache WHERE namespace=?", (namespace,)
+            ).fetchone()
+        else:
+            row = self._conn().execute("SELECT COUNT(*) FROM l1_cache").fetchone()
+        return row[0] if row else 0
+
+    def evict_l1_lru_k(self, max_entries: int, savings_weight: float = 1e-4) -> int:
+        """
+        LRU-K(K=2) eviction: remove lowest-priority entries until count ≤ max_entries.
+        Priority = last_access_1 + tokens_saved * savings_weight (higher = keep longer).
+        """
+        total = self.count_l1_entries()
+        if total <= max_entries:
+            return 0
+        n_evict = total - max_entries
+        conn = self._conn()
+        rows = conn.execute(
+            "SELECT entry_id, namespace FROM l1_cache "
+            "ORDER BY (last_access_1 + tokens_saved * ?) ASC LIMIT ?",
+            (savings_weight, n_evict),
+        ).fetchall()
+        evicted = 0
+        for entry_id, namespace in rows:
+            conn.execute(
+                "DELETE FROM l1_cache WHERE entry_id=? AND namespace=?",
+                (entry_id, namespace),
+            )
+            evicted += 1
+        conn.commit()
+        return evicted
+
+    # ------------------------------------------------------------------
+    # L2 template plan cache (§6.1)
+    # ------------------------------------------------------------------
+
+    def get_l2_plan(self, template_sig: str, tenant_id: str) -> dict[str, Any] | None:
+        row = self._conn().execute(
+            "SELECT plan_json, depends_on_doc_versions FROM l2_plans "
+            "WHERE template_sig=? AND tenant_id=?",
+            (template_sig, tenant_id),
+        ).fetchone()
+        return {"plan_json": row[0], "depends_on_doc_versions": row[1]} if row else None
+
+    def set_l2_plan(
+        self,
+        template_sig: str,
+        tenant_id: str,
+        plan_json: str,
+        depends_on_doc_versions: str,
+    ) -> None:
+        self._conn().execute(
+            """INSERT OR REPLACE INTO l2_plans
+               (template_sig, tenant_id, plan_json, depends_on_doc_versions, created_at)
+               VALUES (?,?,?,?,?)""",
+            (template_sig, tenant_id, plan_json, depends_on_doc_versions, time.time()),
+        )
+        self._conn().commit()
+
+    def invalidate_l2_by_doc(self, doc_hash: str) -> int:
+        """
+        CR-9: delete all L2 plans that depend on doc_hash.
+        Returns the number of plans tombstoned.
+        """
+        conn = self._conn()
+        rows = conn.execute(
+            "SELECT template_sig, tenant_id, depends_on_doc_versions FROM l2_plans"
+        ).fetchall()
+        tombstoned = 0
+        for template_sig, tenant_id, dep_json in rows:
+            try:
+                deps = json.loads(dep_json or "[]")
+            except (json.JSONDecodeError, TypeError):
+                deps = []
+            if doc_hash in deps:
+                conn.execute(
+                    "DELETE FROM l2_plans WHERE template_sig=? AND tenant_id=?",
+                    (template_sig, tenant_id),
+                )
+                tombstoned += 1
+        conn.commit()
+        return tombstoned
