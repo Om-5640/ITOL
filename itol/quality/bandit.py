@@ -49,6 +49,9 @@ def _compute_reward(parity: float, token_reduction: float) -> float:
     return _parity_normalised(parity) - 0.25 * (1.0 - token_reduction)
 
 
+_RECALL_BUMP_THRESHOLD = 0.92  # CR-26: recall below this triggers α=3 conservative prior
+
+
 class BanditController:
     """
     Manages Thompson-sampling arm selection and posterior updates.
@@ -56,21 +59,62 @@ class BanditController:
     `store` holds bandit_state rows; if None, posteriors live only in memory
     (useful for testing without a real database).
     `circuit_breaker` is optional; when provided, select_arm() respects CR-14.
+    `_low_recall_classes` holds classes whose manifest recall < 0.92 (CR-26).
     """
 
     def __init__(
         self,
         store=None,
         circuit_breaker: "CircuitBreaker | None" = None,
+        low_recall_classes: set[str] | None = None,
     ) -> None:
         self._store = store
         self._cb = circuit_breaker
+        # CR-26: classes with recall < 0.92 use α=3 conservative prior
+        self._low_recall_classes: set[str] = low_recall_classes or set()
         # In-memory fallback (used when store is None)
         self._memory: dict[tuple[str, str, float], tuple[float, float]] = {}
+
+    @classmethod
+    def load_with_recall(
+        cls,
+        manifest_recall_path: str,
+        store=None,
+        circuit_breaker: "CircuitBreaker | None" = None,
+    ) -> "BanditController":
+        """
+        CR-26: load manifest_recall.json and return a BanditController that
+        applies an elevated conservative prior (α=3, β=1) for any class whose
+        recall < 0.92.
+        """
+        import json
+        from pathlib import Path
+
+        low_recall: set[str] = set()
+        recall_path = Path(manifest_recall_path)
+        if recall_path.exists():
+            with open(recall_path, encoding="utf-8") as fh:
+                data = json.load(fh)
+            for req_class, recall in data.get("per_class", {}).items():
+                if recall < _RECALL_BUMP_THRESHOLD:
+                    low_recall.add(req_class)
+        return cls(store=store, circuit_breaker=circuit_breaker, low_recall_classes=low_recall)
+
+    def get_conservative_prior(self, request_class: str) -> tuple[float, float]:
+        """
+        CR-26: return (α, β) for the conservative arm prior.
+        Low-recall classes → (3, 1); normal classes → (2, 1).
+        """
+        alpha = 3.0 if request_class in self._low_recall_classes else 2.0
+        return alpha, 1.0
 
     # ------------------------------------------------------------------
     # Alpha/beta accessors
     # ------------------------------------------------------------------
+
+    def _conservative_alpha(self, request_class: str) -> float:
+        """Return the conservative arm starting α — elevated for CR-26 low-recall classes."""
+        return self.get_conservative_prior(request_class)[0]
 
     def _get(self, strategy_id: str, request_class: str, arm: float) -> tuple[float, float]:
         """Return (alpha, beta) for arm; seed conservatism prior for the conservative arm."""
@@ -82,7 +126,10 @@ class BanditController:
             stored_arms = {a for a, _, _ in self._store.get_all_bandit_arms(strategy_id, request_class)}
             if arm not in stored_arms:
                 arms = _arms_for(strategy_id)
-                alpha = 2.0 if arm == _conservative_arm(arms) else 1.0
+                if arm == _conservative_arm(arms):
+                    alpha = self._conservative_alpha(request_class)
+                else:
+                    alpha = 1.0
                 beta  = 1.0
                 self._store.set_bandit_arm(strategy_id, request_class, arm, alpha, beta)
                 return alpha, beta
@@ -91,7 +138,10 @@ class BanditController:
             key = (strategy_id, request_class, arm)
             if key not in self._memory:
                 arms = _arms_for(strategy_id)
-                alpha = 2.0 if arm == _conservative_arm(arms) else 1.0
+                if arm == _conservative_arm(arms):
+                    alpha = self._conservative_alpha(request_class)
+                else:
+                    alpha = 1.0
                 self._memory[key] = (alpha, 1.0)
             return self._memory[key]
 

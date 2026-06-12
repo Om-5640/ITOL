@@ -1,0 +1,13 @@
+{
+  "overall": 0.6575,
+  "per_class": {
+    "EXTRACTION": 0.98,
+    "REASONING": 0.1,
+    "SUMMARIZATION": 1.0,
+    "GENERATION_FACTUAL": 1.0,
+    "GENERATION_CREATIVE": 0.68,
+    "CLASSIFICATION_SHORT": 0.34,
+    "AGENT_TOOL_LOOP": 0.84,
+    "CHAT_OPEN": 0.32
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "coverage": 0.45,
+  "semantic_fidelity": 0.3,
+  "min_window_fidelity": 0.15,
+  "coverage_margin": 0.1
+}

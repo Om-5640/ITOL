@@ -1,0 +1,34 @@
+{
+  "EXTRACTION": {
+    "conservative_alpha": 2,
+    "conservative_beta": 1
+  },
+  "REASONING": {
+    "conservative_alpha": 3,
+    "conservative_beta": 1
+  },
+  "SUMMARIZATION": {
+    "conservative_alpha": 2,
+    "conservative_beta": 1
+  },
+  "GENERATION_FACTUAL": {
+    "conservative_alpha": 2,
+    "conservative_beta": 1
+  },
+  "GENERATION_CREATIVE": {
+    "conservative_alpha": 3,
+    "conservative_beta": 1
+  },
+  "CLASSIFICATION_SHORT": {
+    "conservative_alpha": 3,
+    "conservative_beta": 1
+  },
+  "AGENT_TOOL_LOOP": {
+    "conservative_alpha": 3,
+    "conservative_beta": 1
+  },
+  "CHAT_OPEN": {
+    "conservative_alpha": 3,
+    "conservative_beta": 1
+  }
+}
