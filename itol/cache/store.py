@@ -121,6 +121,34 @@ CREATE TABLE IF NOT EXISTS l2_plans (
     created_at             REAL NOT NULL,
     PRIMARY KEY (template_sig, tenant_id)
 );
+
+CREATE TABLE IF NOT EXISTS shadow_floor_tracking (
+    cell_key   TEXT NOT NULL,
+    date       TEXT NOT NULL,
+    count      INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (cell_key, date)
+);
+
+CREATE TABLE IF NOT EXISTS bandit_state (
+    strategy_id   TEXT NOT NULL,
+    request_class TEXT NOT NULL,
+    arm_value     REAL NOT NULL,
+    alpha         REAL NOT NULL DEFAULT 1.0,
+    beta          REAL NOT NULL DEFAULT 1.0,
+    PRIMARY KEY (strategy_id, request_class, arm_value)
+);
+
+CREATE TABLE IF NOT EXISTS circuit_state (
+    strategy_id      TEXT NOT NULL,
+    request_class    TEXT NOT NULL,
+    tenant_id        TEXT NOT NULL,
+    parity_samples   TEXT NOT NULL DEFAULT '[]',
+    state            TEXT NOT NULL DEFAULT 'CLOSED',
+    violations_24h   INTEGER NOT NULL DEFAULT 0,
+    last_violation_ts REAL NOT NULL DEFAULT 0,
+    disabled         INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (strategy_id, request_class, tenant_id)
+);
 """
 
 
@@ -462,3 +490,145 @@ class Store:
                 tombstoned += 1
         conn.commit()
         return tombstoned
+
+    # ------------------------------------------------------------------
+    # Docs (S4 RACR + S5 CR-5 resurrection archive)
+    # ------------------------------------------------------------------
+
+    def save_doc(
+        self,
+        doc_hash: str,
+        tenant_id: str,
+        conversation_id: str,
+        content: str,
+        version_hash: str,
+    ) -> None:
+        self._conn().execute(
+            """INSERT OR REPLACE INTO docs
+               (doc_hash, tenant_id, conversation_id, content, version_hash, created_at)
+               VALUES (?,?,?,?,?,?)""",
+            (doc_hash, tenant_id, conversation_id, content, version_hash, time.time()),
+        )
+        self._conn().commit()
+
+    def get_doc(
+        self, doc_hash: str, tenant_id: str, conversation_id: str
+    ) -> str | None:
+        row = self._conn().execute(
+            "SELECT content FROM docs WHERE doc_hash=? AND tenant_id=? AND conversation_id=?",
+            (doc_hash, tenant_id, conversation_id),
+        ).fetchone()
+        return row[0] if row else None
+
+    # ------------------------------------------------------------------
+    # Shadow floor tracking (§15.3 — daily minimum 5 calls per cell)
+    # ------------------------------------------------------------------
+
+    def increment_shadow_floor(self, cell_key: str, date: str) -> int:
+        """Increment today's shadow count for cell_key; return new count."""
+        conn = self._conn()
+        conn.execute(
+            """INSERT INTO shadow_floor_tracking (cell_key, date, count) VALUES (?,?,1)
+               ON CONFLICT(cell_key, date) DO UPDATE SET count = count + 1""",
+            (cell_key, date),
+        )
+        conn.commit()
+        row = conn.execute(
+            "SELECT count FROM shadow_floor_tracking WHERE cell_key=? AND date=?",
+            (cell_key, date),
+        ).fetchone()
+        return row[0] if row else 1
+
+    def get_shadow_floor_count(self, cell_key: str, date: str) -> int:
+        row = self._conn().execute(
+            "SELECT count FROM shadow_floor_tracking WHERE cell_key=? AND date=?",
+            (cell_key, date),
+        ).fetchone()
+        return row[0] if row else 0
+
+    # ------------------------------------------------------------------
+    # Bandit state (§5.4 Thompson sampling)
+    # ------------------------------------------------------------------
+
+    def get_bandit_arm(
+        self, strategy_id: str, request_class: str, arm_value: float
+    ) -> tuple[float, float]:
+        """Return (alpha, beta) for the given arm; returns (1.0, 1.0) if absent."""
+        row = self._conn().execute(
+            "SELECT alpha, beta FROM bandit_state "
+            "WHERE strategy_id=? AND request_class=? AND arm_value=?",
+            (strategy_id, request_class, arm_value),
+        ).fetchone()
+        return (row[0], row[1]) if row else (1.0, 1.0)
+
+    def set_bandit_arm(
+        self,
+        strategy_id: str,
+        request_class: str,
+        arm_value: float,
+        alpha: float,
+        beta: float,
+    ) -> None:
+        self._conn().execute(
+            """INSERT OR REPLACE INTO bandit_state
+               (strategy_id, request_class, arm_value, alpha, beta) VALUES (?,?,?,?,?)""",
+            (strategy_id, request_class, arm_value, alpha, beta),
+        )
+        self._conn().commit()
+
+    def get_all_bandit_arms(
+        self, strategy_id: str, request_class: str
+    ) -> list[tuple[float, float, float]]:
+        """Return [(arm_value, alpha, beta), ...] for all arms in this cell."""
+        rows = self._conn().execute(
+            "SELECT arm_value, alpha, beta FROM bandit_state "
+            "WHERE strategy_id=? AND request_class=?",
+            (strategy_id, request_class),
+        ).fetchall()
+        return [(r[0], r[1], r[2]) for r in rows]
+
+    # ------------------------------------------------------------------
+    # Circuit breaker state (§5.4 CR-14)
+    # ------------------------------------------------------------------
+
+    def get_circuit(
+        self, strategy_id: str, request_class: str, tenant_id: str
+    ) -> dict[str, Any] | None:
+        row = self._conn().execute(
+            "SELECT parity_samples, state, violations_24h, last_violation_ts, disabled "
+            "FROM circuit_state WHERE strategy_id=? AND request_class=? AND tenant_id=?",
+            (strategy_id, request_class, tenant_id),
+        ).fetchone()
+        if not row:
+            return None
+        return {
+            "parity_samples": json.loads(row[0]),
+            "state": row[1],
+            "violations_24h": row[2],
+            "last_violation_ts": row[3],
+            "disabled": bool(row[4]),
+        }
+
+    def set_circuit(
+        self,
+        strategy_id: str,
+        request_class: str,
+        tenant_id: str,
+        parity_samples: list[float],
+        state: str,
+        violations_24h: int,
+        last_violation_ts: float,
+        disabled: bool,
+    ) -> None:
+        self._conn().execute(
+            """INSERT OR REPLACE INTO circuit_state
+               (strategy_id, request_class, tenant_id, parity_samples, state,
+                violations_24h, last_violation_ts, disabled)
+               VALUES (?,?,?,?,?,?,?,?)""",
+            (
+                strategy_id, request_class, tenant_id,
+                json.dumps(parity_samples), state,
+                violations_24h, last_violation_ts, int(disabled),
+            ),
+        )
+        self._conn().commit()

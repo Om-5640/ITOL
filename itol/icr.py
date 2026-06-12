@@ -395,6 +395,7 @@ class ICR:
     params: dict[str, Any]      # temperature, max_tokens, stop, etc.
     raw: dict[str, Any]         # original provider-native payload (immutable)
     meta: AnalysisMeta | None = None   # populated by the analysis stage
+    conversation_id: str | None = None  # tracks multi-turn conversation for S5/CR-5/CR-6
 
     # ------------------------------------------------------------------
     def __post_init__(self) -> None:
@@ -423,6 +424,7 @@ class ICR:
         params: dict[str, Any] | None = None,
         tenant_id: str = "default",
         raw: dict[str, Any] | None = None,
+        conversation_id: str | None = None,
     ) -> "ICR":
         """Factory used in tests and by adapters; auto-generates request_id."""
         return cls(
@@ -435,6 +437,7 @@ class ICR:
             tools=tools or [],
             params=params or {},
             raw=raw or {},
+            conversation_id=conversation_id,
         )
 
     def all_text(self) -> str:
