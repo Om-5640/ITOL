@@ -22,3 +22,6 @@ include = ["itol*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v --tb=short"
+markers = [
+    "docker: tests that require Docker to be running (set DOCKER_AVAILABLE=1)",
+]

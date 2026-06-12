@@ -1,0 +1,14 @@
+apiVersion: v2
+name: itol
+description: Intelligent Token Optimization Layer — self-hosted LLM cost/quality proxy
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - llm
+  - token-optimization
+  - proxy
+  - ai
+home: https://github.com/Om-5640/ITOL
+maintainers:
+  - name: ITOL maintainers

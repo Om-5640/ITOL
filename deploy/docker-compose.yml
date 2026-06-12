@@ -1,0 +1,83 @@
+# ITOL Docker Compose — single-SQLite mode (default)
+#
+# Optional Qdrant (vector search) and Redis (L0 cache) services are
+# commented out.  Uncomment and adjust to enable them.
+#
+# Quick start:
+#   docker compose -f deploy/docker-compose.yml up
+#
+# With GPU (when LLMLingua-2 ONNX model is configured):
+#   docker compose -f deploy/docker-compose.yml --profile gpu up
+
+version: "3.9"
+
+services:
+
+  # ─────────────────────────────────────────────
+  # ITOL proxy
+  # ─────────────────────────────────────────────
+  itol:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: itol:latest
+    container_name: itol-proxy
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - itol-data:/data
+      # Optional: mount a custom itol.yaml for multi-tenant config
+      # - ./itol.yaml:/app/itol.yaml:ro
+    environment:
+      ITOL_DATA_DIR: /data
+      ITOL_MODE: optimize
+      ITOL_PORT: "8080"
+      # ITOL_CONFIG_FILE: /app/itol.yaml
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    depends_on: []
+
+  # ─────────────────────────────────────────────
+  # Qdrant — optional vector backend
+  # Uncomment to switch from sqlite_vec to Qdrant.
+  # Also set ITOL_VECTOR_BACKEND=qdrant in the itol service.
+  # ─────────────────────────────────────────────
+  # qdrant:
+  #   image: qdrant/qdrant:v1.9.0
+  #   container_name: itol-qdrant
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6333:6333"
+  #   volumes:
+  #     - qdrant-data:/qdrant/storage
+  #   environment:
+  #     QDRANT__SERVICE__GRPC_PORT: "6334"
+
+  # ─────────────────────────────────────────────
+  # Redis — optional L0 cache backend
+  # Uncomment to use Redis instead of SQLite for L0.
+  # Also set ITOL_REDIS_URL=redis://itol-redis:6379 in the itol service.
+  # ─────────────────────────────────────────────
+  # redis:
+  #   image: redis:7.2-alpine
+  #   container_name: itol-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   command: redis-server --save "" --appendonly no --maxmemory 512mb --maxmemory-policy allkeys-lru
+
+volumes:
+  itol-data:
+    driver: local
+  # qdrant-data:
+  #   driver: local
+  # redis-data:
+  #   driver: local

@@ -162,6 +162,14 @@ CREATE TABLE IF NOT EXISTS breakeven_log (
     passed       INTEGER NOT NULL,
     context_json TEXT
 );
+
+CREATE TABLE IF NOT EXISTS quota_usage (
+    tenant_id TEXT NOT NULL,
+    date      TEXT NOT NULL,
+    requests  INTEGER NOT NULL DEFAULT 0,
+    tokens    INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (tenant_id, date)
+);
 """
 
 
@@ -742,5 +750,38 @@ class Store:
                SET compressed_instruction=?, compression_verified=?
                WHERE template_sig=? AND tenant_id=?""",
             (compressed_instruction, int(verified), template_sig, tenant_id),
+        )
+        conn.commit()
+
+    # ------------------------------------------------------------------
+    # Quota usage  (§11 multitenancy)
+    # ------------------------------------------------------------------
+
+    def get_quota_usage(self, tenant_id: str, date: str) -> dict[str, int]:
+        """Return {requests, tokens} for (tenant_id, date). Returns zeros if absent."""
+        row = self._conn().execute(
+            "SELECT requests, tokens FROM quota_usage WHERE tenant_id=? AND date=?",
+            (tenant_id, date),
+        ).fetchone()
+        if row:
+            return {"requests": row[0], "tokens": row[1]}
+        return {"requests": 0, "tokens": 0}
+
+    def increment_quota(
+        self,
+        tenant_id: str,
+        date: str,
+        requests: int = 1,
+        tokens: int = 0,
+    ) -> None:
+        """Atomically increment daily quota counters for (tenant_id, date)."""
+        conn = self._conn()
+        conn.execute(
+            """INSERT INTO quota_usage (tenant_id, date, requests, tokens)
+               VALUES (?, ?, ?, ?)
+               ON CONFLICT(tenant_id, date)
+               DO UPDATE SET requests = requests + excluded.requests,
+                             tokens   = tokens   + excluded.tokens""",
+            (tenant_id, date, requests, tokens),
         )
         conn.commit()

@@ -1,0 +1,82 @@
+# ITOL Helm chart values
+# Skeleton — adjust for your cluster before deploying.
+# See deploy/helm/templates/ for how these values are used.
+
+# Number of proxy replicas.
+# Note: SQLite data_dir must be on a ReadWriteMany PVC when replicas > 1,
+# or switch to an external Qdrant + Redis backend for multi-replica deployments.
+replicaCount: 1
+
+image:
+  repository: itol
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+# Resource limits — adjust based on profiling.
+# S7 LLMLingua-2 ONNX requires more memory (~2 GB); S1-S6 pipeline runs in ~512 MB.
+resources:
+  requests:
+    cpu: "250m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"
+
+# Persistent volume for SQLite DB, model cache, calibration data.
+persistence:
+  enabled: true
+  storageClass: ""         # leave empty to use the cluster default
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  mountPath: /data
+
+# ITOL runtime environment
+env:
+  ITOL_MODE: "optimize"
+  ITOL_PORT: "8080"
+  # ITOL_CONFIG_FILE: "/config/itol.yaml"
+  # ITOL_VECTOR_BACKEND: "sqlite_vec"   # or "qdrant"
+  # ITOL_REDIS_URL: ""                  # empty = SQLite L0
+
+# Optional: mount a multi-tenant itol.yaml via ConfigMap
+config:
+  enabled: false
+  # configMapName: itol-config
+
+# Liveness and readiness probes
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 15
+  periodSeconds: 30
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false   # SQLite needs to write to data dir
+
+# Node selection / tolerations / affinity — leave empty for defaults
+nodeSelector: {}
+tolerations: []
+affinity: {}
