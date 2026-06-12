@@ -27,6 +27,7 @@ class ClassConfig:
     s1_enabled: bool = True          # semantic deduplication
     s2_enabled: bool = True          # instruction compression (template mining)
     s3_enabled: bool = True          # dynamic context windowing
+    s3_class_budget: int = 4000      # S3 activates when context_tokens > 1.5× this
     s3_mass_floor: float = 0.90      # minimum relevance mass retained by S3
     s4_enabled: bool = True          # retrieval-augmented context replacement
     s5_enabled: bool = True          # conversation history distillation
@@ -42,6 +43,7 @@ class ClassConfig:
 # Spec §7.2 defaults — encoded as a factory so mutations don't alias
 _CLASS_DEFAULTS: dict[str, ClassConfig] = {
     "EXTRACTION": ClassConfig(
+        s3_class_budget=8000,
         s3_mass_floor=0.97,
         s4_enabled=True,      # ⚠ no-full-doc-intent check in strategy
         s7_enabled=False,
@@ -49,6 +51,7 @@ _CLASS_DEFAULTS: dict[str, ClassConfig] = {
         cache_ttl_seconds=72 * 3600,
     ),
     "REASONING": ClassConfig(
+        s3_class_budget=8000,
         s3_mass_floor=0.97,
         s4_enabled=False,
         s7_enabled=False,
@@ -84,6 +87,7 @@ _CLASS_DEFAULTS: dict[str, ClassConfig] = {
         cache_ttl_seconds=7 * 24 * 3600,
     ),
     "AGENT_TOOL_LOOP": ClassConfig(
+        s3_class_budget=6000,
         s6_tool_hygiene=True,    # S6(d+e) enabled
         s7_enabled=False,
         l1_serve=False,          # L0 only per §6.1

@@ -1,0 +1,22 @@
+{
+  "EXTRACTION": [
+    "extract", "parse", "find", "list", "identify", "enumerate", "locate",
+    "retrieve", "fetch", "pull", "get", "read", "scan", "search", "look for",
+    "what is", "what are", "how many", "which"
+  ],
+  "GENERATION_CREATIVE": [
+    "write", "compose", "draft", "create", "craft", "imagine", "invent",
+    "generate", "design", "build", "produce", "make", "tell", "narrate",
+    "describe", "illustrate"
+  ],
+  "REASONING": [
+    "solve", "calculate", "compute", "prove", "analyze", "analyse", "derive",
+    "deduce", "explain", "reason", "determine", "evaluate", "assess", "compare",
+    "contrast", "why", "how does"
+  ],
+  "SUMMARIZATION": [
+    "summarize", "summarise", "condense", "outline", "digest", "recap",
+    "overview", "brief", "tldr", "tl;dr", "shorten", "compress",
+    "abstract", "distil", "distill"
+  ]
+}
