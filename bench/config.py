@@ -73,7 +73,7 @@ class ProviderConfig:
 PROVIDERS: dict[str, ProviderConfig] = {
     "groq": ProviderConfig(
         name="groq",
-        model="llama-3.1-70b-versatile",
+        model="llama-3.3-70b-versatile",
         base_url="https://api.groq.com/openai/v1",
         api_key_env="GROQ_API_KEY",
         chat_path="/chat/completions",

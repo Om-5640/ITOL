@@ -126,13 +126,13 @@ def _run_pipeline(icr, store, config) -> dict:
     from itol.routing.matrix import MATRIX
     from itol.quality.qps import score_and_rollback
     from itol.strategies.s1_dedupe import S1DedupeStrategy
-    from itol.strategies.s6_minify import S6MinifyStrategy
+    from itol.strategies.s6_hygiene import S6HygieneStrategy
     from itol.icr import ConstraintManifest, SegmentSignals
 
     segments = segment_icr(icr)
     signals  = extract_signals(icr, segments)
     cls_result = classify(icr)
-    request_class = cls_result.request_class
+    request_class = cls_result.primary
     manifest = extract_manifest(icr)
 
     matrix_row = MATRIX.get(request_class) or MATRIX.get("CHAT_OPEN")
@@ -146,10 +146,15 @@ def _run_pipeline(icr, store, config) -> dict:
         config=config,
     )
 
-    tokens_before = sum(s.token_count or 0 for s in segments)
+    def _est_tokens(seg) -> int:
+        if seg.token_count:
+            return seg.token_count
+        return max(1, len((seg.text or "").split()) * 4 // 3)
+
+    tokens_before = sum(_est_tokens(s) for s in segments)
 
     # Build strategy list (same order as proxy pipeline)
-    strategies = [S1DedupeStrategy(), S6MinifyStrategy()]
+    strategies = [S1DedupeStrategy(), S6HygieneStrategy()]
     if cls_cfg and getattr(cls_cfg, "s3_enabled", True):
         from itol.strategies.s3_window import S3WindowStrategy
         strategies.append(S3WindowStrategy())
@@ -180,7 +185,7 @@ def _run_pipeline(icr, store, config) -> dict:
     )
 
     tokens_after = sum(
-        s.token_count or 0
+        _est_tokens(s)
         for s in (score_result.segments or current_segments)
     )
     tokens_saved = max(0, tokens_before - tokens_after)

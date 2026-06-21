@@ -201,7 +201,8 @@ async def _run_one_baseline(
                 tokens_estimate=max(200, prompt_len // 4),
             )
             if status != 200:
-                error = f"HTTP {status}: {raw.get('error', '')}"
+                err = raw.get('error', '')
+                error = f"HTTP {status}: {err if isinstance(err, str) else str(err)[:200]}"
             else:
                 response_text, tokens_in, tokens_out = _parse_cohere_response(raw)
             latency_ms = (time.perf_counter() - t_start) * 1000
@@ -220,7 +221,8 @@ async def _run_one_baseline(
                 ).split()) * 4 // 3),
             )
             if status != 200:
-                error = f"HTTP {status}: {str(raw.get('error', ''))[:200]}"
+                err = raw.get('error', '')
+                error = f"HTTP {status}: {err if isinstance(err, str) else str(err)[:300]}"
             else:
                 response_text, tokens_in, tokens_out = _parse_openai_response(
                     raw, provider.name, provider.model, request_id

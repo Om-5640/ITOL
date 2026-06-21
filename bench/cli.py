@@ -50,10 +50,10 @@ def cmd_check(args) -> int:
             continue
         if cfg.available:
             available.append(name)
-            print(f"  ✓ {name:10s}  {cfg.model}  (key: {cfg.api_key_env})")
+            print(f"  [OK] {name:10s}  {cfg.model}  (key: {cfg.api_key_env})")
         else:
             unavailable.append(name)
-            print(f"  ✗ {name:10s}  missing ${cfg.api_key_env}")
+            print(f"  [--] {name:10s}  missing ${cfg.api_key_env}")
 
     print()
     if available:
@@ -68,15 +68,15 @@ def cmd_check(args) -> int:
     # Quick import check
     try:
         from jinja2 import Environment
-        print("✓ jinja2 installed")
+        print("[OK] jinja2 installed")
     except ImportError:
-        print("✗ jinja2 not installed  (pip install jinja2)")
+        print("[--] jinja2 not installed  (pip install jinja2)")
 
     try:
         import weasyprint
-        print("✓ weasyprint installed (PDF export available)")
+        print("[OK] weasyprint installed (PDF export available)")
     except ImportError:
-        print("- weasyprint not installed (PDF export disabled — pip install weasyprint to enable)")
+        print("[--] weasyprint not installed (PDF export disabled)")
 
     return 0
 
@@ -197,8 +197,11 @@ def _print_quick_summary(baseline, itol, workload, provider):
     bl_tok_in  = mean(r.tokens_in for r in baseline) if baseline else 0
     it_tok_in  = mean(r.tokens_in for r in itol)     if itol else 0
     reduction  = (1 - it_tok_in / bl_tok_in) * 100   if bl_tok_in > 0 else 0
-    avg_qp = mean(r.quality_score for r in itol if r.quality_score is not None) or 0
-    print(f"  Summary: token reduction={reduction:.1f}%  quality_parity={avg_qp:.3f}")
+    quality_scores = [r.quality_score for r in itol if r.quality_score is not None]
+    avg_qp = mean(quality_scores) if quality_scores else 0.0
+    errors = sum(1 for r in baseline if r.error)
+    err_note = f"  [{errors} baseline errors]" if errors else ""
+    print(f"  Summary: token reduction={reduction:.1f}%  quality_parity={avg_qp:.3f}{err_note}")
 
 
 # ---------------------------------------------------------------------------
