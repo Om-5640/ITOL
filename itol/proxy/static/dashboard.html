@@ -11,63 +11,65 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-feature-settings: 'cv02','cv03','cv04','cv11'; scroll-behavior: smooth; }
 
-/* ── Design Tokens ─────────────────────────────────────────────────────── */
-[data-theme="dark"] {
-  --bg-base:          #09090f;
-  --bg-elevated:      #111118;
-  --bg-glass:         rgba(255,255,255,0.04);
-  --bg-glass-strong:  rgba(255,255,255,0.07);
-  --border-soft:      rgba(255,255,255,0.05);
-  --border-mid:       rgba(255,255,255,0.08);
-  --border-strong:    rgba(255,255,255,0.14);
-  --text-primary:     #f0f0fa;
-  --text-secondary:   #8b8ba8;
-  --text-tertiary:    #4b4b6a;
-  --accent:           #6366F1;
-  --accent-2:         #8B5CF6;
-  --success:          #10B981;
-  --warning:          #F59E0B;
-  --danger:           #EF4444;
-  --aurora-1:         rgba(99,102,241,0.18);
-  --aurora-2:         rgba(139,92,246,0.14);
-  --aurora-3:         rgba(16,185,129,0.10);
-  --aurora-4:         rgba(239,68,68,0.07);
-  --aurora-5:         rgba(245,158,11,0.06);
-  --shadow-sm:        0 1px 3px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-card:      0 4px 20px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
-  --shadow-card-hover:0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(99,102,241,0.15);
-  --shadow-topbar:    0 1px 0 rgba(255,255,255,0.05), 0 4px 24px rgba(0,0,0,0.4);
-  --ease-spring:      cubic-bezier(0.34,1.56,0.64,1);
-  --ease-out:         cubic-bezier(0.16,1,0.3,1);
+/* ── Global tokens (theme-invariant) ──────────────────────────────────── */
+:root {
+  --accent:         #6366F1;
+  --accent-2:       #8B5CF6;
+  --accent-soft:    rgba(99,102,241,0.10);
+  --accent-glow:    rgba(99,102,241,0.30);
+  --success:        #10B981;
+  --success-soft:   rgba(16,185,129,0.10);
+  --success-glow:   rgba(16,185,129,0.25);
+  --warning:        #F59E0B;
+  --warning-soft:   rgba(245,158,11,0.10);
+  --danger:         #EF4444;
+  --danger-soft:    rgba(239,68,68,0.10);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-theme="light"] {
-  --bg-base:          #f4f4f8;
-  --bg-elevated:      #ffffff;
-  --bg-glass:         rgba(255,255,255,0.6);
-  --bg-glass-strong:  rgba(255,255,255,0.85);
-  --border-soft:      rgba(0,0,0,0.05);
-  --border-mid:       rgba(0,0,0,0.08);
-  --border-strong:    rgba(0,0,0,0.14);
-  --text-primary:     #0f0f1a;
-  --text-secondary:   #5a5a7a;
-  --text-tertiary:    #9090b0;
-  --accent:           #6366F1;
-  --accent-2:         #8B5CF6;
-  --success:          #059669;
-  --warning:          #D97706;
-  --danger:           #DC2626;
-  --aurora-1:         rgba(99,102,241,0.10);
-  --aurora-2:         rgba(139,92,246,0.08);
-  --aurora-3:         rgba(16,185,129,0.07);
-  --aurora-4:         rgba(239,68,68,0.05);
-  --aurora-5:         rgba(245,158,11,0.04);
-  --shadow-sm:        0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-card:      0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
-  --shadow-card-hover:0 6px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(99,102,241,0.10);
-  --shadow-topbar:    0 1px 0 rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.06);
-  --ease-spring:      cubic-bezier(0.34,1.56,0.64,1);
-  --ease-out:         cubic-bezier(0.16,1,0.3,1);
+/* ── Light theme ───────────────────────────────────────────────────────── */
+:root[data-theme="light"] {
+  --bg-base:          #FAFAFB;
+  --bg-elevated:      #FFFFFF;
+  --bg-glass:         rgba(255,255,255,0.62);
+  --bg-glass-strong:  rgba(255,255,255,0.82);
+  --border-soft:      rgba(15,23,42,0.06);
+  --border-mid:       rgba(15,23,42,0.10);
+  --border-strong:    rgba(15,23,42,0.16);
+  --text-primary:     #0F172A;
+  --text-secondary:   #475569;
+  --text-tertiary:    #94A3B8;
+  --aurora-1:         rgba(199,210,254,0.55);
+  --aurora-2:         rgba(254,215,226,0.50);
+  --aurora-3:         rgba(186,230,253,0.48);
+  --aurora-4:         rgba(220,252,231,0.45);
+  --aurora-5:         rgba(243,232,255,0.40);
+  --shadow-card:      0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -8px rgba(15,23,42,0.08);
+  --shadow-card-hover:0 1px 2px rgba(15,23,42,0.04), 0 20px 48px -16px rgba(99,102,241,0.22);
+  --shadow-topbar:    0 1px 0 rgba(15,23,42,0.06), 0 4px 16px rgba(15,23,42,0.06);
+}
+
+/* ── Dark theme ────────────────────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --bg-base:          #0A0A0F;
+  --bg-elevated:      #11121A;
+  --bg-glass:         rgba(20,22,32,0.62);
+  --bg-glass-strong:  rgba(20,22,32,0.82);
+  --border-soft:      rgba(255,255,255,0.06);
+  --border-mid:       rgba(255,255,255,0.10);
+  --border-strong:    rgba(255,255,255,0.16);
+  --text-primary:     #F1F5F9;
+  --text-secondary:   #CBD5E1;
+  --text-tertiary:    #64748B;
+  --aurora-1:         rgba(99,102,241,0.18);
+  --aurora-2:         rgba(236,72,153,0.14);
+  --aurora-3:         rgba(56,189,248,0.16);
+  --aurora-4:         rgba(16,185,129,0.14);
+  --aurora-5:         rgba(168,85,247,0.18);
+  --shadow-card:      0 1px 2px rgba(0,0,0,0.20), 0 8px 24px -8px rgba(0,0,0,0.45);
+  --shadow-card-hover:0 1px 2px rgba(0,0,0,0.20), 0 20px 48px -16px rgba(99,102,241,0.28);
+  --shadow-topbar:    0 1px 0 rgba(255,255,255,0.05), 0 4px 24px rgba(0,0,0,0.4);
 }
 
 /* ── Base ──────────────────────────────────────────────────────────────── */
@@ -82,100 +84,68 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Aurora mesh background ────────────────────────────────────────────── */
-.aurora-layer {
-  position: fixed;
-  inset: -10%;
-  width: 120%;
-  height: 120%;
-  pointer-events: none;
-  z-index: 0;
+/* ── Aurora mesh (exact spec) ──────────────────────────────────────────── */
+.aurora {
+  position: fixed; inset: -10%; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(at 15% 20%, var(--aurora-1) 0px, transparent 50%),
+    radial-gradient(at 85% 18%, var(--aurora-2) 0px, transparent 50%),
+    radial-gradient(at 80% 85%, var(--aurora-3) 0px, transparent 50%),
+    radial-gradient(at 20% 80%, var(--aurora-4) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, var(--aurora-5) 0px, transparent 60%);
   filter: blur(60px) saturate(115%);
-  opacity: 1;
+  animation: aurora-drift 30s ease-in-out infinite alternate;
   will-change: transform;
 }
-
-.aurora-layer-1 {
-  background:
-    radial-gradient(ellipse 60% 50% at 20% 30%, var(--aurora-1) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 60% at 80% 20%, var(--aurora-2) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 50% at 50% 80%, var(--aurora-3) 0%, transparent 70%),
-    radial-gradient(ellipse 35% 40% at 10% 70%, var(--aurora-4) 0%, transparent 70%),
-    radial-gradient(ellipse 45% 35% at 90% 80%, var(--aurora-5) 0%, transparent 70%);
-  animation: aurora-drift-1 30s ease-in-out infinite;
+.aurora-2 {
+  animation: aurora-drift-2 45s ease-in-out infinite alternate;
+  filter: blur(80px) saturate(105%);
+  opacity: 0.6;
 }
-
-.aurora-layer-2 {
-  background:
-    radial-gradient(ellipse 55% 45% at 70% 40%, var(--aurora-2) 0%, transparent 70%),
-    radial-gradient(ellipse 45% 55% at 30% 60%, var(--aurora-1) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 60% 10%, var(--aurora-3) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 50% at 85% 55%, var(--aurora-4) 0%, transparent 70%),
-    radial-gradient(ellipse 30% 40% at 15% 15%, var(--aurora-5) 0%, transparent 70%);
-  animation: aurora-drift-2 45s ease-in-out infinite reverse;
+@keyframes aurora-drift {
+  0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); }
+  50%  { transform: translate3d(-3%,2%,0) scale(1.08) rotate(2deg); }
+  100% { transform: translate3d(3%,-2%,0) scale(1.04) rotate(-1deg); }
 }
-
-.aurora-grain {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.08;
-}
-
-@keyframes aurora-drift-1 {
-  0%, 100% { transform: translate(0,0) scale(1); }
-  25%       { transform: translate(3%,2%) scale(1.02); }
-  50%       { transform: translate(-2%,4%) scale(0.98); }
-  75%       { transform: translate(4%,-2%) scale(1.01); }
-}
-
 @keyframes aurora-drift-2 {
-  0%, 100% { transform: translate(0,0) scale(1); }
-  33%       { transform: translate(-3%,2%) scale(1.03); }
-  66%       { transform: translate(2%,-3%) scale(0.97); }
+  0%   { transform: translate3d(2%,-1%,0) scale(1.02); }
+  100% { transform: translate3d(-2%,1%,0) scale(1.06); }
 }
+
+/* ── Grain (exact spec) ────────────────────────────────────────────────── */
+.grain {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  opacity: 0.08; mix-blend-mode: multiply;
+}
+:root[data-theme="dark"] .grain { mix-blend-mode: screen; opacity: 0.05; }
 
 /* ── Keyframes ─────────────────────────────────────────────────────────── */
 @keyframes enter {
   from { opacity: 0; transform: translateY(20px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-
 @keyframes pulse-dot {
-  0%   { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
-  70%  { box-shadow: 0 0 0 6px transparent; opacity: 0.7; }
-  100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
+  0%   { box-shadow: 0 0 0 0 var(--success-glow); }
+  70%  { box-shadow: 0 0 0 10px rgba(16,185,129,0); }
+  100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
 }
-
 @keyframes flash {
-  0%   { border-color: var(--border-mid); }
-  30%  { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(99,102,241,0.2), var(--shadow-card); }
-  100% { border-color: var(--border-mid); }
+  0%   { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), var(--shadow-card); }
+  100% { border-color: var(--border-soft); box-shadow: var(--shadow-card); }
 }
-
 @keyframes slide-in {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 /* ── Reduced motion ────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .aurora-layer, .aurora-layer-1, .aurora-layer-2 { animation: none; }
-  .card, .stat-card { animation: none !important; opacity: 1 !important; }
-  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .aurora, .aurora-2 { animation: none !important; }
 }
 
-/* ── Main layout ───────────────────────────────────────────────────────── */
-.main-wrap {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-}
+/* ── Layout ────────────────────────────────────────────────────────────── */
+.main-wrap { position: relative; z-index: 1; min-height: 100vh; }
 
 .page {
   max-width: 1440px;
@@ -183,203 +153,6 @@ body {
   padding: 0 32px 64px;
 }
 
-/* ── Topbar ────────────────────────────────────────────────────────────── */
-.topbar {
-  position: sticky;
-  top: 0;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0;
-  background: rgba(9,9,15,0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--border-soft);
-  box-shadow: var(--shadow-topbar);
-  z-index: 100;
-  margin: 0 -32px;
-  padding: 0 32px;
-}
-
-[data-theme="light"] .topbar {
-  background: rgba(244,244,248,0.75);
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  color: inherit;
-  user-select: none;
-}
-
-.logo-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 20px rgba(99,102,241,0.35), 0 2px 8px rgba(0,0,0,0.3);
-  flex-shrink: 0;
-}
-
-.logo-mark svg { width: 18px; height: 18px; color: #fff; }
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.logo-name {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  color: var(--text-primary);
-  line-height: 1;
-}
-
-.logo-sub {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  line-height: 1;
-}
-
-.topbar-center {
-  display: flex;
-  align-items: center;
-}
-
-/* Sliding segmented control */
-.seg-control {
-  position: relative;
-  display: flex;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-mid);
-  border-radius: 10px;
-  padding: 3px;
-  gap: 0;
-}
-
-.seg-indicator {
-  position: absolute;
-  top: 3px;
-  height: calc(100% - 6px);
-  background: var(--bg-glass-strong);
-  border: 1px solid var(--border-strong);
-  border-radius: 7px;
-  transition: left 0.22s var(--ease-out), width 0.22s var(--ease-out);
-  box-shadow: var(--shadow-sm);
-  pointer-events: none;
-}
-
-.seg-btn {
-  position: relative;
-  padding: 5px 16px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  border-radius: 7px;
-  transition: color 0.15s;
-  white-space: nowrap;
-  z-index: 1;
-}
-
-.seg-btn.active { color: var(--text-primary); font-weight: 600; }
-.seg-btn:hover:not(.active) { color: var(--text-primary); }
-
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Live indicator */
-.live-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--border-mid);
-  background: var(--bg-glass);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: 0.3px;
-  transition: all 0.2s;
-  user-select: none;
-}
-
-.live-indicator[data-state="connected"] {
-  color: var(--success);
-  border-color: rgba(16,185,129,0.25);
-  background: rgba(16,185,129,0.06);
-}
-
-.live-indicator[data-state="error"] {
-  color: var(--danger);
-  border-color: rgba(239,68,68,0.25);
-  background: rgba(239,68,68,0.06);
-}
-
-.live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-}
-
-[data-state="connected"] .live-dot {
-  animation: pulse-dot 2s ease-out infinite;
-}
-
-/* Theme toggle */
-.theme-toggle {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9px;
-  border: 1px solid var(--border-mid);
-  background: var(--bg-glass);
-  cursor: pointer;
-  color: var(--text-secondary);
-  transition: color 0.15s, background 0.15s, border-color 0.15s;
-  flex-shrink: 0;
-}
-
-.theme-toggle:hover { color: var(--text-primary); background: var(--bg-glass-strong); }
-.theme-toggle svg { width: 16px; height: 16px; }
-.theme-toggle .icon-moon { display: none; }
-[data-theme="light"] .theme-toggle .icon-sun  { display: none; }
-[data-theme="light"] .theme-toggle .icon-moon { display: block; }
-
-.version-pill {
-  font-size: 10px;
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-  font-weight: 500;
-  color: var(--text-tertiary);
-  padding: 3px 8px;
-  border: 1px solid var(--border-soft);
-  border-radius: 6px;
-  background: var(--bg-glass);
-  letter-spacing: 0.3px;
-}
-
-/* ── Grid layout ───────────────────────────────────────────────────────── */
 .content { padding-top: 32px; }
 
 .grid-12 {
@@ -387,561 +160,343 @@ body {
   grid-template-columns: repeat(12, 1fr);
   gap: 24px;
 }
-
 .col-4  { grid-column: span 4; }
 .col-6  { grid-column: span 6; }
 .col-8  { grid-column: span 8; }
 .col-12 { grid-column: span 12; }
 
-@media (max-width: 1200px) {
-  .col-4 { grid-column: span 6; }
-  .col-8 { grid-column: span 12; }
-}
-@media (max-width: 900px) {
-  .col-4, .col-6, .col-8 { grid-column: span 12; }
+@media (max-width: 1200px) { .col-4 { grid-column: span 6; } .col-8 { grid-column: span 12; } }
+@media (max-width: 900px)  { .col-4, .col-6, .col-8 { grid-column: span 12; } }
+
+/* ── Topbar ────────────────────────────────────────────────────────────── */
+.topbar {
+  position: sticky; top: 0; height: 64px; z-index: 100;
+  display: flex; align-items: center;
+  background: var(--bg-glass-strong);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-topbar);
+  margin: 0 -32px; padding: 0 32px;
 }
 
-/* Hero stats row */
+.topbar-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; max-width: 1440px; margin: 0 auto;
+}
+
+/* ── Logo ──────────────────────────────────────────────────────────────── */
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; user-select: none; }
+
+.logo-mark {
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 16px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.2);
+}
+.logo-mark svg { width: 14px; height: 14px; color: #fff; }
+
+.logo-text { display: flex; flex-direction: column; gap: 1px; }
+.logo-name { font-size: 16px; font-weight: 600; letter-spacing: -0.4px; color: var(--text-primary); line-height: 1; }
+.logo-sub  { font-size: 10px; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.8px; line-height: 1; }
+
+/* ── Segmented control ─────────────────────────────────────────────────── */
+.seg-control {
+  position: relative; display: flex;
+  background: var(--bg-glass); border: 1px solid var(--border-mid);
+  border-radius: 10px; padding: 3px;
+}
+.seg-indicator {
+  position: absolute; top: 3px; height: calc(100% - 6px);
+  background: var(--bg-glass-strong); border: 1px solid var(--border-strong);
+  border-radius: 7px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  transition: left 0.22s var(--ease-out-expo), width 0.22s var(--ease-out-expo);
+  pointer-events: none;
+}
+.seg-btn {
+  position: relative; z-index: 1;
+  padding: 5px 16px; font-size: 12px; font-weight: 500;
+  color: var(--text-secondary); cursor: pointer;
+  border: none; background: transparent; border-radius: 7px;
+  transition: color 0.15s; white-space: nowrap;
+}
+.seg-btn.active { color: var(--text-primary); font-weight: 600; }
+.seg-btn:hover:not(.active) { color: var(--text-primary); }
+
+/* ── Topbar right cluster ──────────────────────────────────────────────── */
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+/* Live indicator (exact spec) */
+.live {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: 999px;
+  background: var(--bg-glass); border: 1px solid var(--border-soft);
+  font-size: 12px; font-weight: 500; color: var(--text-tertiary);
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-tertiary); flex-shrink: 0; transition: background 0.2s; }
+.live[data-state="connected"] .live-dot { background: var(--success); animation: pulse-dot 2s var(--ease-out-quart) infinite; }
+.live[data-state="connected"] .live-text { color: var(--success); }
+.live[data-state="connected"] { border-color: var(--success-soft); }
+.live[data-state="error"] .live-dot { background: var(--danger); }
+.live[data-state="error"] .live-text { color: var(--danger); }
+.live[data-state="error"] { border-color: var(--danger-soft); }
+
+/* Theme toggle (sun ↔ moon morph) */
+.theme-toggle {
+  position: relative; width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9px; border: 1px solid var(--border-mid);
+  background: var(--bg-glass); cursor: pointer;
+  color: var(--text-secondary); overflow: hidden;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.theme-toggle:hover { color: var(--text-primary); background: var(--bg-glass-strong); }
+
+.toggle-icon {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 400ms var(--ease-out-expo), transform 400ms var(--ease-out-expo);
+}
+.toggle-icon svg { width: 16px; height: 16px; }
+
+.icon-sun  { opacity: 1; transform: rotate(0deg); }
+.icon-moon { opacity: 0; transform: rotate(180deg); }
+:root[data-theme="light"] .icon-sun  { opacity: 0; transform: rotate(180deg); }
+:root[data-theme="light"] .icon-moon { opacity: 1; transform: rotate(0deg); }
+
+/* Icon button (settings) */
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9px; border: 1px solid var(--border-mid);
+  background: var(--bg-glass); cursor: pointer; color: var(--text-secondary);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.icon-btn:hover { color: var(--text-primary); background: var(--bg-glass-strong); }
+.icon-btn svg { width: 16px; height: 16px; }
+
+.version-pill {
+  font-size: 10px; font-family: 'JetBrains Mono','Fira Code',ui-monospace,monospace;
+  font-weight: 500; color: var(--text-tertiary);
+  padding: 3px 8px; border: 1px solid var(--border-soft);
+  border-radius: 6px; background: var(--bg-glass); letter-spacing: 0.3px;
+}
+
+/* ── Hero grid ─────────────────────────────────────────────────────────── */
 .hero-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 16px; margin-bottom: 24px;
 }
+@media (max-width: 1100px) { .hero-grid { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 700px)  { .hero-grid { grid-template-columns: repeat(2,1fr); } }
 
-@media (max-width: 1100px) { .hero-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 700px)  { .hero-grid { grid-template-columns: repeat(2, 1fr); } }
-
-/* ── Glass card pattern ────────────────────────────────────────────────── */
+/* ── Glass card ────────────────────────────────────────────────────────── */
 .card {
-  position: relative;
+  position: relative; overflow: hidden;
   background: var(--bg-glass);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid var(--border-mid);
-  border-radius: 16px;
-  padding: 24px;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px; padding: 24px;
   box-shadow: var(--shadow-card);
-  transition: transform 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out), border-color 0.22s;
-  opacity: 0;
-  animation: enter 0.5s var(--ease-out) forwards;
-  overflow: hidden;
+  transition: transform 280ms var(--ease-out-expo),
+              box-shadow 280ms var(--ease-out-expo),
+              border-color 280ms;
+  opacity: 0; animation: enter 700ms var(--ease-out-expo) both;
 }
-
 .card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 12px;
-  right: 12px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-  pointer-events: none;
+  content: ''; position: absolute; top: 0; left: 16px; right: 16px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  opacity: 0.6; pointer-events: none;
 }
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card-hover); border-color: var(--border-mid); }
 
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: var(--border-strong);
-}
+.card--flash { animation: flash 500ms var(--ease-out-quart) !important; opacity: 1 !important; }
 
-.card--flash {
-  animation: flash 0.7s var(--ease-out) !important;
-  opacity: 1 !important;
-}
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.card-title  { font-size: 13px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.1px; }
+.card-meta   { font-size: 11px; color: var(--text-tertiary); }
 
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.card-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-  letter-spacing: -0.1px;
-}
-
-.card-meta {
-  font-size: 11px;
-  color: var(--text-tertiary);
-}
-
-/* ── Stat cards ────────────────────────────────────────────────────────── */
+/* ── Stat card ─────────────────────────────────────────────────────────── */
 .stat-card {
-  position: relative;
+  position: relative; overflow: hidden; cursor: default;
   background: var(--bg-glass);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid var(--border-mid);
-  border-radius: 16px;
-  padding: 20px 20px 16px;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px; padding: 20px 20px 16px;
   box-shadow: var(--shadow-card);
-  transition: transform 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out), border-color 0.22s;
-  opacity: 0;
-  animation: enter 0.5s var(--ease-out) forwards;
-  overflow: hidden;
-  cursor: default;
+  transition: transform 280ms var(--ease-out-expo),
+              box-shadow 280ms var(--ease-out-expo),
+              border-color 280ms;
+  opacity: 0; animation: enter 700ms var(--ease-out-expo) both;
 }
-
 .stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 12px;
-  right: 12px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-  pointer-events: none;
+  content: ''; position: absolute; top: 0; left: 16px; right: 16px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  opacity: 0.6; pointer-events: none;
 }
-
-.stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: var(--border-strong);
-}
-
-.stat-card--flash {
-  animation: flash 0.7s var(--ease-out) !important;
-  opacity: 1 !important;
-}
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card-hover); border-color: var(--border-mid); }
+.stat-card--flash { animation: flash 500ms var(--ease-out-quart) !important; opacity: 1 !important; }
 
 .stat-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-  flex-shrink: 0;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--accent-soft); color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px; flex-shrink: 0;
 }
-
-.stat-icon svg { width: 15px; height: 15px; }
+.stat-icon [data-lucide], .stat-icon svg { width: 16px; height: 16px; }
 
 .stat-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.9px;
-  margin-bottom: 6px;
+  font-size: 10px; font-weight: 600; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 6px;
 }
-
 .stat-value {
-  font-size: 38px;
-  font-weight: 700;
-  letter-spacing: -1.5px;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  margin-bottom: 8px;
+  font-size: 38px; font-weight: 600; letter-spacing: -0.02em;
+  line-height: 1; font-variant-numeric: tabular-nums; margin-bottom: 8px;
+  color: var(--text-primary);
 }
-
 .stat-delta {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 20px;
-  margin-bottom: 12px;
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 600;
+  padding: 2px 6px; border-radius: 20px; margin-bottom: 12px;
 }
-
-.delta-up   { color: var(--success);  background: rgba(16,185,129,0.1); }
-.delta-down { color: var(--danger);   background: rgba(239,68,68,0.1); }
-.delta-neu  { color: var(--text-secondary); background: var(--bg-glass-strong); }
+.delta-up  { color: var(--success); background: var(--success-soft); }
+.delta-dn  { color: var(--danger);  background: var(--danger-soft); }
+.delta-neu { color: var(--text-tertiary); background: var(--border-soft); }
 
 .sparkline-wrap { height: 32px; margin: 0 -4px; }
 
-/* card accent colors */
-.stat-card[data-card="cost"]      { --card-color: #10B981; }
-.stat-card[data-card="tokens"]    { --card-color: #6366F1; }
-.stat-card[data-card="requests"]  { --card-color: #8B5CF6; }
-.stat-card[data-card="qps"]       { --card-color: #F59E0B; }
-.stat-card[data-card="rollbacks"] { --card-color: #EF4444; }
+/* Stat card per-card accent */
+[data-card="cost"]      .stat-icon { background: var(--success-soft);  color: var(--success);  }
+[data-card="cost"]      .stat-value { color: var(--success);  text-shadow: 0 0 40px var(--success-glow); }
+[data-card="tokens"]    .stat-icon { background: var(--accent-soft);   color: var(--accent);   }
+[data-card="tokens"]    .stat-value { color: var(--accent);   text-shadow: 0 0 40px var(--accent-glow); }
+[data-card="requests"]  .stat-icon { background: var(--border-soft);   color: var(--text-secondary); }
+[data-card="requests"]  .stat-value { color: var(--text-primary); }
+[data-card="qps"]       .stat-icon { background: var(--warning-soft);  color: var(--warning);  }
+[data-card="rollbacks"] .stat-icon { background: var(--danger-soft);   color: var(--danger);   }
 
-.stat-value   { color: var(--card-color, var(--text-primary)); }
-.stat-icon    { background: color-mix(in srgb, var(--card-color, var(--accent)) 12%, transparent); }
-.stat-icon svg{ color: var(--card-color, var(--accent)); }
-
-/* text-shadow glow on stat values */
-.stat-card[data-card="cost"]      .stat-value { text-shadow: 0 0 32px rgba(16,185,129,0.4); }
-.stat-card[data-card="tokens"]    .stat-value { text-shadow: 0 0 32px rgba(99,102,241,0.4); }
-.stat-card[data-card="requests"]  .stat-value { text-shadow: 0 0 32px rgba(139,92,246,0.4); }
-.stat-card[data-card="qps"]       .stat-value { text-shadow: 0 0 32px rgba(245,158,11,0.4); }
-.stat-card[data-card="rollbacks"] .stat-value { text-shadow: 0 0 32px rgba(239,68,68,0.4); }
-
-/* ── Section label ─────────────────────────────────────────────────────── */
-.section-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 14px;
-}
-
-/* ── Strategy bars ─────────────────────────────────────────────────────── */
-.strategy-list { display: flex; flex-direction: column; gap: 12px; }
-
-.strategy-row { display: flex; flex-direction: column; gap: 5px; }
-
-.strategy-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.strategy-name {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-  letter-spacing: -0.2px;
-}
-
-.strategy-pct {
-  font-size: 11px;
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
-}
-
-.strategy-bar-track {
-  height: 5px;
-  background: var(--border-soft);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.strategy-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  width: 0;
-  transition: width 0.6s var(--ease-spring);
-}
-
-/* per-strategy pastel colors */
-.strategy-bar-fill[data-s="s1"] { background: linear-gradient(90deg,#6366F1,#818CF8); }
-.strategy-bar-fill[data-s="s2"] { background: linear-gradient(90deg,#8B5CF6,#A78BFA); }
-.strategy-bar-fill[data-s="s3"] { background: linear-gradient(90deg,#10B981,#34D399); }
-.strategy-bar-fill[data-s="s4"] { background: linear-gradient(90deg,#F59E0B,#FCD34D); }
-.strategy-bar-fill[data-s="s5"] { background: linear-gradient(90deg,#EF4444,#F87171); }
-.strategy-bar-fill[data-s="s6"] { background: linear-gradient(90deg,#06B6D4,#67E8F9); }
-.strategy-bar-fill[data-s="s7"] { background: linear-gradient(90deg,#EC4899,#F9A8D4); }
-.strategy-bar-fill[data-s="default"] { background: linear-gradient(90deg,var(--accent),var(--accent-2)); }
-
-/* ── Cache donut wrapper ────────────────────────────────────────────────── */
-.cache-donuts {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
-@media (max-width: 700px) { .cache-donuts { grid-template-columns: repeat(2, 1fr); } }
-
-.donut-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.donut-canvas-wrap {
-  position: relative;
-  width: 80px;
-  height: 80px;
-}
-
-.donut-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  line-height: 1.15;
-}
-
-.donut-center-val {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  font-variant-numeric: tabular-nums;
-}
-
-.donut-center-pct {
-  font-size: 9px;
-  color: var(--text-tertiary);
-  font-weight: 500;
-}
-
-.donut-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-tertiary);
-  text-align: center;
-}
-
-.donut-item[data-level="l0"] .donut-center-val { color: var(--success); }
-.donut-item[data-level="l1"] .donut-center-val { color: var(--accent); }
-.donut-item[data-level="l2"] .donut-center-val { color: var(--accent-2); }
-.donut-item[data-level="miss"] .donut-center-val { color: var(--text-secondary); }
-
-/* ── QPS chart area ─────────────────────────────────────────────────────── */
+/* ── Chart wrap ────────────────────────────────────────────────────────── */
 .chart-wrap { position: relative; width: 100%; }
 
+/* ── Cache donuts (3 ring gauges) ──────────────────────────────────────── */
+.cache-ring-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+
+.ring-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.ring-canvas-wrap { position: relative; width: 100px; height: 100px; }
+.ring-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.9px; color: var(--text-tertiary); }
+
+/* ── Scrollbar (spec exact) ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
 /* ── Activity feed ─────────────────────────────────────────────────────── */
-.activity-feed {
-  max-height: 480px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-strong) transparent;
-}
-
-.activity-feed::-webkit-scrollbar { width: 5px; }
-.activity-feed::-webkit-scrollbar-track { background: transparent; }
-.activity-feed::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
-.activity-feed::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
-
-.activity-header {
-  display: grid;
-  grid-template-columns: 90px 120px 100px 1fr 100px 80px 60px 80px;
-  gap: 8px;
-  padding: 0 16px 10px;
-  border-bottom: 1px solid var(--border-soft);
-  margin-bottom: 2px;
-}
-
-@media (max-width: 900px) {
-  .activity-header { grid-template-columns: 90px 1fr 80px 60px 80px; }
-  .ah-model, .ah-strategies, .ah-tokens { display: none; }
-}
-
-.ah-cell {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-tertiary);
-}
+.activity-list { max-height: 480px; overflow-y: auto; }
 
 .activity-row {
-  display: grid;
-  grid-template-columns: 90px 120px 100px 1fr 100px 80px 60px 80px;
-  gap: 8px;
-  align-items: center;
-  padding: 0 16px;
-  min-height: 56px;
-  border-radius: 10px;
-  transition: background 0.12s;
-  animation: slide-in 0.2s var(--ease-out);
+  display: flex; align-items: center; gap: 12px;
+  min-height: 56px; padding: 0 4px;
+  border-bottom: 1px solid var(--border-soft);
+  animation: slide-in 400ms var(--ease-out-expo) both;
+  transition: background 0.15s;
+  border-radius: 8px;
 }
+.activity-row:last-child { border-bottom: none; }
+.activity-row:hover { background: var(--accent-soft); }
 
-@media (max-width: 900px) {
-  .activity-row { grid-template-columns: 90px 1fr 80px 60px 80px; }
-  .ar-model, .ar-strategies, .ar-tokens { display: none; }
+.activity-saved { font-size: 12px; font-weight: 600; color: var(--success); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.activity-qps   { font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.activity-meta  { font-size: 11px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+
+/* ── Badges (8 classes) ────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 600;
+  font-family: 'JetBrains Mono','Fira Code',ui-monospace,monospace;
+  letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0;
 }
+.badge-indigo   { background: rgba(99,102,241,0.12); color: #6366F1; }
+.badge-violet   { background: rgba(139,92,246,0.12); color: #8B5CF6; }
+.badge-emerald  { background: rgba(16,185,129,0.10); color: #10B981; }
+.badge-amber    { background: rgba(245,158,11,0.10); color: #F59E0B; }
+.badge-rose     { background: rgba(244,63,94,0.10);  color: #F43F5E; }
+.badge-sky      { background: rgba(56,189,248,0.10); color: #38BDF8; }
+.badge-fuchsia  { background: rgba(217,70,239,0.10); color: #D946EF; }
+.badge-purple   { background: rgba(168,85,247,0.10); color: #A855F7; }
+.badge-default  { background: var(--border-soft); color: var(--text-secondary); }
 
-.activity-row:hover { background: var(--bg-glass); }
-
-.ar-cell {
-  font-size: 12px;
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.req-id {
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-  font-size: 11px;
-  color: var(--text-tertiary);
-}
-
-.class-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 5px;
-  font-size: 10px;
-  font-weight: 600;
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-}
-
-/* per-class badge colors */
-.badge-simple   { background: rgba(99,102,241,0.12); color: var(--accent); }
-.badge-complex  { background: rgba(139,92,246,0.12); color: var(--accent-2); }
-.badge-code     { background: rgba(16,185,129,0.10); color: var(--success); }
-.badge-creative { background: rgba(245,158,11,0.10); color: var(--warning); }
-.badge-factual  { background: rgba(239,68,68,0.10); color: var(--danger); }
-.badge-other    { background: var(--bg-glass-strong); color: var(--text-secondary); }
-
-.strat-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 1px 5px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-  background: rgba(99,102,241,0.1);
-  color: var(--accent);
-  margin-right: 3px;
-  letter-spacing: 0.2px;
-}
-
-.tokens-val {
-  font-size: 12px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-  color: var(--success);
-}
-
-.qps-val {
-  font-size: 11px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-}
 .qps-pass { color: var(--success); }
 .qps-warn { color: var(--warning); }
-.qps-fail { color: var(--danger); }
-
-.cache-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 7px;
-  border-radius: 5px;
-  font-size: 10px;
-  font-weight: 600;
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-}
-
-.cache-chip-l0   { background: rgba(16,185,129,0.1);  color: var(--success); }
-.cache-chip-l1   { background: rgba(99,102,241,0.1);  color: var(--accent); }
-.cache-chip-l2   { background: rgba(139,92,246,0.1);  color: var(--accent-2); }
-.cache-chip-miss { background: var(--bg-glass-strong); color: var(--text-secondary); }
-
-.time-val {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  font-variant-numeric: tabular-nums;
-}
+.qps-fail { color: var(--danger);  }
 
 /* ── Empty state ───────────────────────────────────────────────────────── */
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 56px 24px;
-  text-align: center;
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--border-soft) 0,
-    var(--border-soft) 1px,
-    transparent 0,
-    transparent 50%
-  );
-  background-size: 14px 14px;
-  border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px 24px; text-align: center;
 }
-
-.empty-icon {
-  width: 40px;
-  height: 40px;
-  opacity: 0.25;
-  margin-bottom: 16px;
-  color: var(--text-secondary);
+.empty-state-inner {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect width='20' height='20' fill='none'/%3E%3Ccircle cx='1' cy='1' r='1' fill='rgba(148,163,184,0.15)'/%3E%3C/svg%3E");
+  background-size: 20px 20px;
+  border-radius: 12px; padding: 40px 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 0; width: 100%;
 }
-
-.empty-icon svg { width: 40px; height: 40px; }
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-tertiary);
-  max-width: 260px;
-  line-height: 1.6;
-}
-
-.empty-live {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  margin: 16px auto 0;
-  animation: pulse-dot 2s ease-out infinite;
-}
+.empty-icon { opacity: 0.25; color: var(--text-secondary); margin-bottom: 12px; }
+.empty-icon [data-lucide], .empty-icon svg { width: 32px; height: 32px; }
+.empty-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+.empty-desc  { font-size: 12px; color: var(--text-tertiary); max-width: 220px; line-height: 1.6; margin-bottom: 12px; }
+.empty-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse-dot 2s ease-out infinite; }
 </style>
 </head>
 <body>
 
-<!-- Aurora mesh -->
-<div class="aurora-layer aurora-layer-1" aria-hidden="true"></div>
-<div class="aurora-layer aurora-layer-2" aria-hidden="true"></div>
-<svg class="aurora-grain" aria-hidden="true">
-  <filter id="grain-filter">
-    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
-    <feColorMatrix type="saturate" values="0"/>
-  </filter>
-  <rect width="100%" height="100%" filter="url(#grain-filter)"/>
+<!-- Aurora mesh (both layers share same CSS background, different animations) -->
+<div class="aurora" aria-hidden="true"></div>
+<div class="aurora aurora-2" aria-hidden="true"></div>
+<svg class="grain" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/></filter>
+  <rect width="100%" height="100%" filter="url(#n)"/>
 </svg>
 
 <div class="main-wrap">
+
   <!-- Topbar -->
-  <header class="topbar" id="topbar">
-    <div class="page" style="display:flex;align-items:center;justify-content:space-between;width:100%;padding-top:0;padding-bottom:0;">
+  <header class="topbar">
+    <div class="topbar-inner">
       <a class="logo" href="#" aria-label="ITOL Dashboard">
         <div class="logo-mark" aria-hidden="true">
-          <!-- Zap icon -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
         <div class="logo-text">
           <span class="logo-name">ITOL</span>
-          <span class="logo-sub">Token Optimization</span>
+          <span class="logo-sub">Token Optimization Layer</span>
         </div>
       </a>
 
-      <div class="topbar-center">
-        <div class="seg-control" id="segControl" role="group" aria-label="Time window">
-          <div class="seg-indicator" id="segIndicator"></div>
-          <button class="seg-btn active" data-window="24h">24h</button>
-          <button class="seg-btn" data-window="7d">7d</button>
-          <button class="seg-btn" data-window="30d">30d</button>
-        </div>
+      <div class="seg-control" id="segControl" role="group" aria-label="Time window">
+        <div class="seg-indicator" id="segIndicator"></div>
+        <button class="seg-btn active" data-window="24h">24h</button>
+        <button class="seg-btn" data-window="7d">7d</button>
+        <button class="seg-btn" data-window="30d">30d</button>
       </div>
 
       <div class="topbar-right">
-        <div class="live-indicator" id="liveIndicator" data-state="connecting">
-          <div class="live-dot" aria-hidden="true"></div>
-          <span id="liveText">Connecting</span>
+        <div class="live" id="liveEl" data-state="connecting">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span class="live-text" id="liveText">Connecting…</span>
         </div>
 
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">
-          <!-- Sun icon -->
-          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="7.05" y2="16.95"/><line x1="16.95" y1="7.05" x2="19.78" y2="4.22"/>
-          </svg>
-          <!-- Moon icon -->
-          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="toggle-icon icon-sun"><i data-lucide="sun"></i></span>
+          <span class="toggle-icon icon-moon"><i data-lucide="moon"></i></span>
+        </button>
+
+        <button class="icon-btn" aria-label="Settings">
+          <i data-lucide="settings"></i>
         </button>
 
         <span class="version-pill">v0.1.0</span>
@@ -953,66 +508,64 @@ body {
   <div class="page content">
 
     <!-- Hero stat cards -->
-    <div class="hero-grid" id="heroGrid">
+    <div class="hero-grid">
       <div class="stat-card" data-card="cost" style="animation-delay:0ms">
-        <div class="stat-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        </div>
+        <div class="stat-icon" aria-hidden="true"><i data-lucide="dollar-sign"></i></div>
         <div class="stat-label">Cost Saved</div>
         <div class="stat-value" id="valCost" data-format="usd">$0.00</div>
-        <div class="stat-delta delta-neu" id="deltaCost">this window</div>
+        <div class="stat-delta delta-neu" id="deltaCost">—</div>
         <div class="sparkline-wrap"><canvas id="sparkCost"></canvas></div>
       </div>
 
       <div class="stat-card" data-card="tokens" style="animation-delay:80ms">
-        <div class="stat-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-        </div>
+        <div class="stat-icon" aria-hidden="true"><i data-lucide="zap"></i></div>
         <div class="stat-label">Tokens Saved</div>
         <div class="stat-value" id="valTokens" data-format="default">0</div>
-        <div class="stat-delta delta-neu" id="deltaTokens">cumulative</div>
+        <div class="stat-delta delta-neu" id="deltaTokens">—</div>
         <div class="sparkline-wrap"><canvas id="sparkTokens"></canvas></div>
       </div>
 
       <div class="stat-card" data-card="requests" style="animation-delay:160ms">
-        <div class="stat-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </div>
+        <div class="stat-icon" aria-hidden="true"><i data-lucide="activity"></i></div>
         <div class="stat-label">Requests</div>
         <div class="stat-value" id="valReqs" data-format="default">0</div>
-        <div class="stat-delta delta-neu">total processed</div>
+        <div class="stat-delta delta-neu" id="deltaReqs">—</div>
         <div class="sparkline-wrap"><canvas id="sparkReqs"></canvas></div>
       </div>
 
       <div class="stat-card" data-card="qps" style="animation-delay:240ms">
-        <div class="stat-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
+        <div class="stat-icon" aria-hidden="true"><i data-lucide="gauge"></i></div>
         <div class="stat-label">Avg QPS</div>
         <div class="stat-value" id="valQps" data-format="qps">—</div>
-        <div class="stat-delta delta-neu">quality score</div>
+        <div class="stat-delta delta-neu" id="deltaQps">quality score</div>
         <div class="sparkline-wrap"><canvas id="sparkQps"></canvas></div>
       </div>
 
       <div class="stat-card" data-card="rollbacks" style="animation-delay:320ms">
-        <div class="stat-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.21"/></svg>
-        </div>
+        <div class="stat-icon" aria-hidden="true"><i data-lucide="rotate-ccw"></i></div>
         <div class="stat-label">Rollbacks</div>
         <div class="stat-value" id="valRollbacks" data-format="default">0</div>
-        <div class="stat-delta delta-neu">QPS gate trips</div>
+        <div class="stat-delta delta-neu" id="deltaRollbacks">QPS gate trips</div>
         <div class="sparkline-wrap"><canvas id="sparkRollbacks"></canvas></div>
       </div>
     </div>
 
-    <!-- Savings chart + Strategy breakdown -->
+    <!-- Savings chart + Strategy -->
     <div class="grid-12" style="margin-bottom:24px">
       <div class="card col-8" style="animation-delay:400ms">
         <div class="card-header">
           <span class="card-title">Savings Over Time</span>
           <span class="card-meta" id="chartWindowLabel">Last 24 hours</span>
         </div>
-        <div class="chart-wrap" style="height:220px">
+        <div id="savingsEmptyState" class="empty-state" style="display:none">
+          <div class="empty-state-inner">
+            <div class="empty-icon"><i data-lucide="trending-up"></i></div>
+            <div class="empty-title">Waiting for first requests…</div>
+            <div class="empty-desc">Token savings will appear here as requests flow through ITOL.</div>
+            <div class="empty-pulse"></div>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height:220px" id="savingsChartWrap">
           <canvas id="savingsChart"></canvas>
         </div>
       </div>
@@ -1021,65 +574,46 @@ body {
         <div class="card-header">
           <span class="card-title">Strategy Breakdown</span>
         </div>
-        <div class="strategy-list" id="strategyList">
-          <div class="empty-state">
-            <div class="empty-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-            </div>
-            <div class="empty-desc">No strategy data yet</div>
-            <div class="empty-live"></div>
+        <div id="strategyEmpty" class="empty-state">
+          <div class="empty-state-inner">
+            <div class="empty-icon"><i data-lucide="bar-chart-horizontal"></i></div>
+            <div class="empty-title">Waiting for first requests…</div>
+            <div class="empty-desc">Strategy usage will appear here.</div>
+            <div class="empty-pulse"></div>
           </div>
+        </div>
+        <div id="strategyChartWrap" style="display:none; position:relative; height:220px">
+          <canvas id="strategyChart"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- Cache donuts + QPS histogram -->
+    <!-- Cache gauges + QPS histogram -->
     <div class="grid-12" style="margin-bottom:24px">
       <div class="card col-6" style="animation-delay:560ms">
         <div class="card-header">
           <span class="card-title">Cache Performance</span>
           <span class="card-meta" id="cacheHitRate">— hit rate</span>
         </div>
-        <div class="cache-donuts">
-          <div class="donut-item" data-level="l0">
-            <div class="donut-canvas-wrap">
-              <canvas id="donutL0" width="80" height="80"></canvas>
-              <div class="donut-center">
-                <span class="donut-center-val" id="donutValL0">0</span>
-                <span class="donut-center-pct" id="donutPctL0">0%</span>
-              </div>
-            </div>
-            <span class="donut-label">L0 Exact</span>
+        <div id="cacheEmpty" class="empty-state" style="display:none">
+          <div class="empty-state-inner">
+            <div class="empty-icon"><i data-lucide="gauge"></i></div>
+            <div class="empty-title">Waiting for first requests…</div>
+            <div class="empty-pulse"></div>
           </div>
-          <div class="donut-item" data-level="l1">
-            <div class="donut-canvas-wrap">
-              <canvas id="donutL1" width="80" height="80"></canvas>
-              <div class="donut-center">
-                <span class="donut-center-val" id="donutValL1">0</span>
-                <span class="donut-center-pct" id="donutPctL1">0%</span>
-              </div>
-            </div>
-            <span class="donut-label">L1 Semantic</span>
+        </div>
+        <div class="cache-ring-grid" id="cacheRingGrid">
+          <div class="ring-item">
+            <div class="ring-canvas-wrap"><canvas id="donutL0" width="100" height="100"></canvas></div>
+            <span class="ring-label">L0 Exact</span>
           </div>
-          <div class="donut-item" data-level="l2">
-            <div class="donut-canvas-wrap">
-              <canvas id="donutL2" width="80" height="80"></canvas>
-              <div class="donut-center">
-                <span class="donut-center-val" id="donutValL2">0</span>
-                <span class="donut-center-pct" id="donutPctL2">0%</span>
-              </div>
-            </div>
-            <span class="donut-label">L2 Template</span>
+          <div class="ring-item">
+            <div class="ring-canvas-wrap"><canvas id="donutL1" width="100" height="100"></canvas></div>
+            <span class="ring-label">L1 Semantic</span>
           </div>
-          <div class="donut-item" data-level="miss">
-            <div class="donut-canvas-wrap">
-              <canvas id="donutMiss" width="80" height="80"></canvas>
-              <div class="donut-center">
-                <span class="donut-center-val" id="donutValMiss">0</span>
-                <span class="donut-center-pct" id="donutPctMiss">0%</span>
-              </div>
-            </div>
-            <span class="donut-label">Miss</span>
+          <div class="ring-item">
+            <div class="ring-canvas-wrap"><canvas id="donutL2" width="100" height="100"></canvas></div>
+            <span class="ring-label">L2 Template</span>
           </div>
         </div>
       </div>
@@ -1096,34 +630,20 @@ body {
     </div>
 
     <!-- Activity feed -->
-    <div class="card col-12" style="animation-delay:720ms;margin-bottom:0">
+    <div class="card col-12" style="animation-delay:720ms; margin-bottom:0">
       <div class="card-header">
         <span class="card-title">Recent Activity</span>
         <span class="card-meta" id="activityMeta">0 requests</span>
       </div>
-      <div id="activityContent">
-        <div class="empty-state" id="emptyActivity">
-          <div class="empty-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </div>
-          <div class="empty-title">No activity yet</div>
+      <div id="activityEmpty" class="empty-state">
+        <div class="empty-state-inner">
+          <div class="empty-icon"><i data-lucide="inbox"></i></div>
+          <div class="empty-title">Waiting for first requests…</div>
           <div class="empty-desc">Requests processed through ITOL will appear here in real time.</div>
-          <div class="empty-live"></div>
-        </div>
-        <div id="activityFeedWrap" style="display:none">
-          <div class="activity-header">
-            <span class="ah-cell">Request ID</span>
-            <span class="ah-cell ah-model">Model</span>
-            <span class="ah-cell">Class</span>
-            <span class="ah-cell ah-strategies">Strategies</span>
-            <span class="ah-cell ah-tokens">Tokens</span>
-            <span class="ah-cell">QPS</span>
-            <span class="ah-cell">Cache</span>
-            <span class="ah-cell">Time</span>
-          </div>
-          <div class="activity-feed" id="activityFeed"></div>
+          <div class="empty-pulse"></div>
         </div>
       </div>
+      <div id="activityList" class="activity-list" style="display:none"></div>
     </div>
 
   </div><!-- /page.content -->
@@ -1136,160 +656,172 @@ body {
 <!-- chartjs-plugin-annotation -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- Lucide icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
 <script>
 'use strict';
 
 // ── State ────────────────────────────────────────────────────────────────────
 let currentWindow = '24h';
-let savingsChart = null;
-let qpsChart = null;
-let donutCharts = {};
-let sparkCharts = {};
-let sse = null;
+let savingsChart  = null;
+let strategyChart = null;
+let qpsChart      = null;
+let donutCharts   = {};
+let sparkCharts   = {};
+let sse           = null;
 let reconnectTimer = null;
-const MAX_FEED_ROWS = 20;
+const MAX_FEED   = 20;
 const qpsBuckets = new Array(10).fill(0);
-let prevStats = {};
+let prevStats    = {};
+let isFirstLoad  = true;
 
 // ── Theme ────────────────────────────────────────────────────────────────────
 (function() {
   const saved = localStorage.getItem('itol-theme');
-  if (saved === 'light' || saved === 'dark') {
-    document.documentElement.dataset.theme = saved;
-  }
+  if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
 })();
 
 document.getElementById('themeToggle').addEventListener('click', () => {
-  const curr = document.documentElement.dataset.theme;
-  const next = curr === 'dark' ? 'light' : 'dark';
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = next;
   localStorage.setItem('itol-theme', next);
   updateChartTheme();
+  // Re-render donuts (center text colours change)
+  Object.values(donutCharts).forEach(c => c && c.update('none'));
 });
 
-function isDark() {
-  return document.documentElement.dataset.theme !== 'light';
-}
+function isDark() { return document.documentElement.dataset.theme !== 'light'; }
 
-function chartColor(opacity) {
-  return isDark()
-    ? `rgba(255,255,255,${opacity})`
-    : `rgba(0,0,0,${opacity})`;
-}
+function tColor(op) { return isDark() ? `rgba(255,255,255,${op})` : `rgba(15,23,42,${op})`; }
 
 function updateChartTheme() {
-  const tc = chartColor(0.35);
-  const gc = chartColor(0.04);
-  Chart.defaults.color = tc;
-  Chart.defaults.borderColor = gc;
-  if (savingsChart) {
-    savingsChart.options.scales.x.grid.color = gc;
-    savingsChart.options.scales.x.ticks.color = tc;
-    savingsChart.options.scales.y.grid.color = gc;
-    savingsChart.options.scales.y.ticks.color = tc;
-    savingsChart.update('none');
-  }
-  if (qpsChart) {
-    qpsChart.options.scales.x.ticks.color = tc;
-    qpsChart.options.scales.y.grid.color = gc;
-    qpsChart.options.scales.y.ticks.color = tc;
-    qpsChart.update('none');
-  }
+  Chart.defaults.color       = tColor(0.5);
+  Chart.defaults.borderColor = tColor(0.05);
+  const gc = tColor(0.05);
+  const tc = tColor(0.5);
+  [savingsChart, strategyChart, qpsChart].forEach(c => {
+    if (!c) return;
+    Object.values(c.options.scales || {}).forEach(ax => {
+      if (ax.grid)  ax.grid.color  = gc;
+      if (ax.ticks) ax.ticks.color = tc;
+    });
+    c.update('none');
+  });
 }
 
-// ── animateValue ─────────────────────────────────────────────────────────────
-function animateValue(el, from, to, duration, formatter) {
+// ── Custom donut center-text plugin ─────────────────────────────────────────
+const donutCenterPlugin = {
+  id: 'donutCenter',
+  afterDraw(chart) {
+    if (chart.config.type !== 'doughnut') return;
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return;
+    const cx = (chartArea.left + chartArea.right) / 2;
+    const cy = (chartArea.top  + chartArea.bottom) / 2;
+    const pct = Math.round(chart.data.datasets[0]?.data[0] || 0);
+    const opts = chart.options.plugins?.donutCenter || {};
+    const dark = isDark();
+    ctx.save();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = "600 18px 'Inter var','Inter',sans-serif";
+    ctx.fillStyle = opts.color || (dark ? '#F1F5F9' : '#0F172A');
+    ctx.fillText(pct + '%', cx, cy - 8);
+    ctx.font = "600 9px 'Inter var','Inter',sans-serif";
+    ctx.fillStyle = dark ? '#64748B' : '#94A3B8';
+    ctx.fillText((opts.label || '').toUpperCase(), cx, cy + 9);
+    ctx.restore();
+  }
+};
+Chart.register(donutCenterPlugin);
+
+// ── Chart.js global defaults ─────────────────────────────────────────────────
+Chart.defaults.font.family = "'Inter var','Inter',system-ui,sans-serif";
+Chart.defaults.font.size   = 11;
+Chart.defaults.color       = tColor(0.5);
+Chart.defaults.borderColor = tColor(0.05);
+Chart.defaults.animation.duration = 700;
+Chart.defaults.animation.easing   = 'easeOutQuart';
+
+// ── animateValue (exact spec signature) ──────────────────────────────────────
+function animateValue(el, from, to, duration = 700) {
   if (!el) return;
   const start = performance.now();
-  function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
-  function step(now) {
-    const t = Math.min((now - start) / duration, 1);
-    const v = from + (to - from) * easeOutQuart(t);
-    const fmt = formatter || el.dataset.format;
-    if (fmt === 'usd') {
-      el.textContent = fmtUsd(v);
-    } else if (fmt === 'qps') {
-      el.textContent = v > 0 ? v.toFixed(4) : '—';
-    } else {
-      el.textContent = fmtCompact(v);
-    }
-    if (t < 1) requestAnimationFrame(step);
+  const ease = t => 1 - Math.pow(1 - t, 4); // easeOutQuart
+  function tick(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const v = from + (to - from) * ease(p);
+    el.textContent = formatValue(v, el.dataset.format);
+    if (p < 1) requestAnimationFrame(tick);
   }
-  requestAnimationFrame(step);
+  requestAnimationFrame(tick);
 }
 
-function fmtUsd(v) {
-  if (v >= 1)      return '$' + v.toFixed(2);
-  if (v >= 0.001)  return '$' + v.toFixed(4);
-  return '$' + v.toFixed(6);
+function formatValue(v, fmt) {
+  if (fmt === 'usd') return '$' + v.toFixed(2);
+  if (fmt === 'qps') return v.toFixed(3);
+  return Math.round(v).toLocaleString();
 }
 
-function fmtCompact(v) {
-  const n = Math.round(v);
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-  if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'k';
-  return n.toLocaleString();
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function timeAgo(ts) {
-  const diff = Date.now() / 1000 - ts;
-  if (diff < 60)    return Math.round(diff) + 's ago';
-  if (diff < 3600)  return Math.round(diff / 60) + 'm ago';
-  if (diff < 86400) return Math.round(diff / 3600) + 'h ago';
-  return new Date(ts * 1000).toLocaleDateString();
-}
-
-function escHtml(s) {
-  return String(s || '')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+  const d = Date.now()/1000 - ts;
+  if (d < 60)    return Math.round(d)  + 's ago';
+  if (d < 3600)  return Math.round(d/60) + 'm ago';
+  if (d < 86400) return Math.round(d/3600) + 'h ago';
+  return new Date(ts*1000).toLocaleDateString();
 }
 
 function qpsCls(v) {
-  if (v == null)  return '';
-  if (v >= 0.98)  return 'qps-pass';
-  if (v >= 0.90)  return 'qps-warn';
+  if (v == null) return '';
+  if (v >= 0.98) return 'qps-pass';
+  if (v >= 0.95) return 'qps-warn';
   return 'qps-fail';
 }
 
+const CLASS_BADGE = {
+  simple:'badge-indigo', complex:'badge-violet', code:'badge-emerald',
+  creative:'badge-amber', factual:'badge-rose', chat:'badge-sky',
+  extraction:'badge-fuchsia', classification:'badge-purple',
+};
 function classBadge(cls) {
-  const map = {
-    simple: 'badge-simple', complex: 'badge-complex',
-    code: 'badge-code', creative: 'badge-creative',
-    factual: 'badge-factual',
-  };
-  const c = map[String(cls || '').toLowerCase()] || 'badge-other';
-  return `<span class="class-badge ${c}">${escHtml(cls || '—')}</span>`;
+  const c = CLASS_BADGE[String(cls||'').toLowerCase()] || 'badge-default';
+  return `<span class="badge ${c}">${escHtml(cls||'—')}</span>`;
 }
 
-function stratColor(id) {
-  const s = String(id || '').toLowerCase();
-  if (s === 's1') return '#6366F1';
-  if (s === 's2') return '#8B5CF6';
-  if (s === 's3') return '#10B981';
-  if (s === 's4') return '#F59E0B';
-  if (s === 's5') return '#EF4444';
-  if (s === 's6') return '#06B6D4';
-  if (s === 's7') return '#EC4899';
-  return '#6366F1';
-}
-
-function stratBarAttr(id) {
-  const s = String(id || '').toLowerCase();
-  if (['s1','s2','s3','s4','s5','s6','s7'].includes(s)) return s;
-  return 'default';
-}
+const STRAT_SOFT = {
+  s1:'rgba(99,102,241,0.65)', s2:'rgba(139,92,246,0.65)', s3:'rgba(56,189,248,0.65)',
+  s4:'rgba(16,185,129,0.65)', s5:'rgba(245,158,11,0.65)', s6:'rgba(244,63,94,0.65)',
+  s7:'rgba(217,70,239,0.65)',
+};
+function stratSoft(id) { return STRAT_SOFT[String(id||'').toLowerCase()] || 'rgba(99,102,241,0.65)'; }
 
 // ── Card flash ───────────────────────────────────────────────────────────────
 function flashCard(el) {
   if (!el) return;
-  el.classList.remove('card--flash', 'stat-card--flash');
+  el.classList.remove('card--flash','stat-card--flash');
   void el.offsetWidth;
   el.classList.add(el.classList.contains('stat-card') ? 'stat-card--flash' : 'card--flash');
-  setTimeout(() => el.classList.remove('card--flash', 'stat-card--flash'), 800);
+  setTimeout(() => el.classList.remove('card--flash','stat-card--flash'), 600);
+}
+
+// ── Delta subline ────────────────────────────────────────────────────────────
+function renderDelta(elId, cur, prev) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (isFirstLoad || prev === 0 || prev == null) {
+    el.className = 'stat-delta delta-neu';
+    el.textContent = '—';
+    return;
+  }
+  const pct = (cur - prev) / prev * 100;
+  const up  = pct >= 0;
+  el.className  = 'stat-delta ' + (up ? 'delta-up' : 'delta-dn');
+  el.textContent = (up ? '↑ ' : '↓ ') + Math.abs(pct).toFixed(1) + '% vs prev';
 }
 
 // ── Segmented control ────────────────────────────────────────────────────────
@@ -1298,48 +830,40 @@ function initSegControl() {
   const ind  = document.getElementById('segIndicator');
   const btns = ctrl.querySelectorAll('.seg-btn');
 
-  function positionIndicator(activeBtn) {
-    const ctrlRect = ctrl.getBoundingClientRect();
-    const btnRect  = activeBtn.getBoundingClientRect();
-    ind.style.left  = (btnRect.left - ctrlRect.left) + 'px';
-    ind.style.width = btnRect.width + 'px';
+  function posInd(btn) {
+    const cr = ctrl.getBoundingClientRect();
+    const br = btn.getBoundingClientRect();
+    ind.style.left  = (br.left - cr.left) + 'px';
+    ind.style.width = br.width + 'px';
   }
 
-  btns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      btns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentWindow = btn.dataset.window;
-      positionIndicator(btn);
-      fetchStats();
-      updateChartWindowLabel();
-    });
-  });
+  btns.forEach(btn => btn.addEventListener('click', () => {
+    btns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentWindow = btn.dataset.window;
+    posInd(btn);
+    fetchStats();
+    document.getElementById('chartWindowLabel').textContent =
+      ({  '24h':'Last 24 hours','7d':'Last 7 days','30d':'Last 30 days' })[currentWindow] || '';
+  }));
 
-  // initial position after fonts loaded
-  requestAnimationFrame(() => {
-    const active = ctrl.querySelector('.seg-btn.active');
-    if (active) positionIndicator(active);
-  });
+  requestAnimationFrame(() => { const a = ctrl.querySelector('.active'); if (a) posInd(a); });
 }
 
-function updateChartWindowLabel() {
-  const labels = { '24h': 'Last 24 hours', '7d': 'Last 7 days', '30d': 'Last 30 days' };
-  const el = document.getElementById('chartWindowLabel');
-  if (el) el.textContent = labels[currentWindow] || '';
-}
-
-// ── Sparkline charts ─────────────────────────────────────────────────────────
+// ── Sparklines ───────────────────────────────────────────────────────────────
 function initSparkline(id, color) {
-  const ctx = document.getElementById(id);
-  if (!ctx) return null;
-  return new Chart(ctx, {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  const grad = el.getContext('2d').createLinearGradient(0,0,0,32);
+  grad.addColorStop(0,   color.replace(')',',0.3)').replace('rgb','rgba'));
+  grad.addColorStop(1, 'transparent');
+  return new Chart(el, {
     type: 'line',
-    data: { labels: [], datasets: [{ data: [], borderColor: color, borderWidth: 1.5, fill: false, tension: 0.4, pointRadius: 0 }] },
+    data: { labels:[], datasets:[{ data:[], borderColor: color, backgroundColor: grad, borderWidth:1.5, fill:true, tension:0.4, pointRadius:0 }] },
     options: {
-      responsive: true, maintainAspectRatio: false, animation: false,
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      scales: { x: { display: false }, y: { display: false, beginAtZero: true } },
+      responsive:true, maintainAspectRatio:false, animation:false,
+      plugins:{ legend:{display:false}, tooltip:{enabled:false} },
+      scales:{ x:{display:false}, y:{display:false, beginAtZero:true} },
     }
   });
 }
@@ -1347,190 +871,56 @@ function initSparkline(id, color) {
 function initSparklines() {
   sparkCharts.cost      = initSparkline('sparkCost',      '#10B981');
   sparkCharts.tokens    = initSparkline('sparkTokens',    '#6366F1');
-  sparkCharts.reqs      = initSparkline('sparkReqs',      '#8B5CF6');
+  sparkCharts.reqs      = initSparkline('sparkReqs',      '#94A3B8');
   sparkCharts.qps       = initSparkline('sparkQps',       '#F59E0B');
   sparkCharts.rollbacks = initSparkline('sparkRollbacks', '#EF4444');
 }
 
-function pushSparkline(key, val) {
-  const ch = sparkCharts[key];
-  if (!ch) return;
+function pushSpark(key, val) {
+  const ch = sparkCharts[key]; if (!ch) return;
   ch.data.labels.push('');
   ch.data.datasets[0].data.push(val);
-  if (ch.data.labels.length > 20) {
-    ch.data.labels.shift();
-    ch.data.datasets[0].data.shift();
-  }
+  if (ch.data.labels.length > 24) { ch.data.labels.shift(); ch.data.datasets[0].data.shift(); }
   ch.update('none');
 }
 
 // ── Savings line chart ───────────────────────────────────────────────────────
 function initSavingsChart() {
-  const ctx = document.getElementById('savingsChart').getContext('2d');
-  const grad = ctx.createLinearGradient(0, 0, 0, 220);
-  grad.addColorStop(0,   'rgba(99,102,241,0.28)');
-  grad.addColorStop(0.65,'rgba(99,102,241,0.06)');
-  grad.addColorStop(1,   'rgba(99,102,241,0)');
-
-  const gc = chartColor(0.04);
-  const tc = chartColor(0.35);
+  const canvas = document.getElementById('savingsChart');
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,220);
+  grad.addColorStop(0, 'rgba(99,102,241,0.30)');
+  grad.addColorStop(1, 'rgba(99,102,241,0)');
+  const gc = tColor(0.04); const tc = tColor(0.5);
 
   savingsChart = new Chart(ctx, {
     type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Tokens Saved',
-        data: [],
-        borderColor: '#6366F1',
-        backgroundColor: grad,
-        fill: true,
-        tension: 0.42,
-        pointRadius: 0,
-        pointHoverRadius: 4,
-        pointHoverBackgroundColor: '#6366F1',
-        borderWidth: 2,
-      }]
-    },
+    data: { labels:[], datasets:[{
+      label:'Tokens Saved', data:[], fill:true,
+      borderColor:'#6366F1', backgroundColor:grad,
+      borderWidth:2.5, tension:0.42,
+      pointRadius:0, pointHoverRadius:5,
+      pointHoverBackgroundColor:'#fff',
+      pointHoverBorderColor:'#6366F1', pointHoverBorderWidth:2,
+    }]},
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      animation: { duration: 600, easing: 'easeOutQuart' },
-      scales: {
-        x: {
-          grid: { color: gc },
-          ticks: { color: tc, maxTicksLimit: 8, maxRotation: 0 },
-          border: { display: false },
-        },
-        y: {
-          grid: { color: gc },
-          ticks: {
-            color: tc,
-            callback: v => v >= 1000 ? (v/1000).toFixed(0) + 'k' : v,
-          },
-          beginAtZero: true,
-          border: { display: false },
-        }
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      scales:{
+        x:{ grid:{color:gc}, ticks:{color:tc, maxTicksLimit:8, maxRotation:0}, border:{display:false} },
+        y:{ grid:{color:gc}, ticks:{color:tc, callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v}, beginAtZero:true, border:{display:false} }
       },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: isDark() ? 'rgba(9,9,15,0.95)' : 'rgba(255,255,255,0.95)',
-          borderColor: chartColor(0.08),
-          borderWidth: 1,
-          padding: 12,
-          titleColor: chartColor(0.5),
-          bodyColor: chartColor(0.85),
-          callbacks: {
-            label: ctx => '  ' + ctx.raw.toLocaleString() + ' tokens saved',
-          }
-        }
-      }
-    }
-  });
-}
-
-// ── Donut charts ─────────────────────────────────────────────────────────────
-function initDonut(id, color) {
-  const ctx = document.getElementById(id);
-  if (!ctx) return null;
-  return new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      datasets: [{
-        data: [0, 100],
-        backgroundColor: [color, isDark() ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'],
-        borderWidth: 0,
-        hoverOffset: 0,
-      }]
-    },
-    options: {
-      responsive: false,
-      cutout: '78%',
-      animation: { duration: 600, easing: 'easeOutQuart' },
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-    }
-  });
-}
-
-function initDonuts() {
-  donutCharts.l0   = initDonut('donutL0',   '#10B981');
-  donutCharts.l1   = initDonut('donutL1',   '#6366F1');
-  donutCharts.l2   = initDonut('donutL2',   '#8B5CF6');
-  donutCharts.miss = initDonut('donutMiss', isDark() ? '#4b4b6a' : '#9090b0');
-}
-
-function updateDonut(key, count, pct) {
-  const ch = donutCharts[key];
-  if (!ch) return;
-  const rem = Math.max(0, 100 - pct);
-  ch.data.datasets[0].data = [pct, rem];
-  ch.update('none');
-
-  const valEl = document.getElementById('donutVal' + key.charAt(0).toUpperCase() + key.slice(1));
-  const pctEl = document.getElementById('donutPct' + key.charAt(0).toUpperCase() + key.slice(1));
-  if (valEl) animateValue(valEl, 0, count, 400);
-  if (pctEl) pctEl.textContent = pct.toFixed(0) + '%';
-}
-
-// ── QPS histogram ────────────────────────────────────────────────────────────
-function initQpsChart() {
-  const ctx = document.getElementById('qpsChart').getContext('2d');
-  const labels = ['0.0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9'];
-  const colors = labels.map((_, i) => {
-    if (i >= 8) return 'rgba(99,102,241,0.7)';
-    if (i >= 6) return 'rgba(245,158,11,0.6)';
-    return 'rgba(239,68,68,0.5)';
-  });
-  const tc = chartColor(0.35);
-  const gc = chartColor(0.04);
-
-  qpsChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Requests',
-        data: qpsBuckets.slice(),
-        backgroundColor: colors,
-        borderRadius: 4,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 400 },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: tc }, border: { display: false } },
-        y: {
-          grid: { color: gc },
-          ticks: { color: tc, precision: 0 },
-          beginAtZero: true,
-          border: { display: false },
-        }
-      },
-      plugins: {
-        legend: { display: false },
-        annotation: {
-          annotations: {
-            floorLine: {
-              type: 'line',
-              xMin: 9.2,
-              xMax: 9.2,
-              borderColor: 'rgba(16,185,129,0.6)',
-              borderWidth: 2,
-              borderDash: [4, 3],
-              label: {
-                content: '0.98',
-                display: true,
-                position: 'end',
-                backgroundColor: 'rgba(16,185,129,0.15)',
-                color: '#10B981',
-                font: { size: 10, weight: '600' },
-                padding: { x: 4, y: 2 },
-              }
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor: isDark()?'rgba(10,10,15,0.95)':'rgba(255,255,255,0.95)',
+          borderColor:tColor(0.08), borderWidth:1, padding:12,
+          titleColor:tColor(0.5), bodyColor:tColor(0.85),
+          callbacks:{
+            label:c => '  ' + c.raw.toLocaleString() + ' tokens saved',
+            afterLabel:c => {
+              const cost = (c.raw * 0.000015);
+              return '  ~$' + cost.toFixed(4) + ' saved';
             }
           }
         }
@@ -1539,248 +929,332 @@ function initQpsChart() {
   });
 }
 
-// ── Apply stats snapshot ──────────────────────────────────────────────────────
-function applyStats(stats) {
-  if (!stats || typeof stats !== 'object') return;
-  const prev = prevStats;
-  prevStats = stats;
+// ── Strategy horizontal bar chart ────────────────────────────────────────────
+function updateStrategyChart(sbd) {
+  const entries = Object.entries(sbd||{}).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const emptyEl = document.getElementById('strategyEmpty');
+  const wrapEl  = document.getElementById('strategyChartWrap');
 
-  // Hero cards
-  const costEl  = document.getElementById('valCost');
-  const tokEl   = document.getElementById('valTokens');
-  const reqEl   = document.getElementById('valReqs');
-  const qpsEl   = document.getElementById('valQps');
-  const rollEl  = document.getElementById('valRollbacks');
-
-  const pCost  = prev.cost_saved_usd  || 0;
-  const pTok   = prev.tokens_saved    || 0;
-  const pReq   = prev.total_requests  || 0;
-  const pQps   = prev.avg_qps         || 0;
-  const pRoll  = prev.rollbacks        || 0;
-
-  const nCost  = stats.cost_saved_usd  || 0;
-  const nTok   = stats.tokens_saved    || 0;
-  const nReq   = stats.total_requests  || 0;
-  const nQps   = stats.avg_qps         || 0;
-  const nRoll  = stats.rollbacks        || 0;
-
-  animateValue(costEl, pCost, nCost, 600);
-  animateValue(tokEl,  pTok,  nTok,  600);
-  animateValue(reqEl,  pReq,  nReq,  600);
-  if (nQps > 0) {
-    animateValue(qpsEl, pQps, nQps, 600);
-  } else {
-    qpsEl.textContent = '—';
-  }
-  animateValue(rollEl, pRoll, nRoll, 600);
-
-  // Sparklines
-  pushSparkline('cost',      nCost);
-  pushSparkline('tokens',    nTok);
-  pushSparkline('reqs',      nReq);
-  pushSparkline('qps',       nQps);
-  pushSparkline('rollbacks', nRoll);
-
-  // Flash on change
-  const cards = document.querySelectorAll('.stat-card');
-  if (nTok !== pTok)  flashCard(cards[1]);
-  if (nReq !== pReq)  flashCard(cards[2]);
-
-  // Savings timeseries
-  if (savingsChart && Array.isArray(stats.timeseries) && stats.timeseries.length > 0) {
-    savingsChart.data.labels = stats.timeseries.map(r => {
-      const d = new Date(r.ts_hour * 3600 * 1000);
-      if (currentWindow === '24h') {
-        return d.getUTCHours().toString().padStart(2,'0') + ':00';
-      }
-      return (d.getUTCMonth()+1) + '/' + d.getUTCDate();
-    });
-    savingsChart.data.datasets[0].data = stats.timeseries.map(r => r.tokens_saved || 0);
-    savingsChart.update('none');
+  if (!entries.length) {
+    emptyEl.style.display = ''; wrapEl.style.display = 'none';
+    if (strategyChart) { strategyChart.destroy(); strategyChart = null; }
+    return;
   }
 
-  // Strategy breakdown
-  const stratEl = document.getElementById('strategyList');
-  const sbd = stats.strategy_breakdown || {};
-  const entries = Object.entries(sbd).sort((a,b) => b[1] - a[1]);
-  if (entries.length > 0) {
-    const total = entries.reduce((s,[,v]) => s + v, 0) || 1;
-    stratEl.innerHTML = entries.slice(0,8).map(([id, cnt]) => {
-      const pct = (cnt / total * 100);
-      const sa  = stratBarAttr(id);
-      const clr = stratColor(id);
-      return `<div class="strategy-row">
-        <div class="strategy-meta">
-          <span class="strategy-name">${escHtml(id)}</span>
-          <span class="strategy-pct">${pct.toFixed(1)}%</span>
-        </div>
-        <div class="strategy-bar-track">
-          <div class="strategy-bar-fill" data-s="${sa}" style="width:${pct.toFixed(1)}%;background:linear-gradient(90deg,${clr},${clr}cc)"></div>
-        </div>
-      </div>`;
-    }).join('');
-  } else {
-    stratEl.innerHTML = `<div class="empty-state">
-      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
-      <div class="empty-desc">No strategy data yet</div>
-      <div class="empty-live"></div>
-    </div>`;
-  }
+  emptyEl.style.display = 'none'; wrapEl.style.display = 'block';
+  const labels = entries.map(([id])=>id);
+  const values = entries.map(([,v])=>v);
+  const colors = entries.map(([id])=>stratSoft(id));
+  const gc = tColor(0.04); const tc = tColor(0.5);
 
-  // Cache donuts
-  const cb = stats.cache_breakdown || {};
-  const cTotal = (cb.l0||0) + (cb.l1||0) + (cb.l2||0) + (cb.miss||0) || 1;
-  updateDonut('l0',   cb.l0   || 0, (cb.l0   || 0) / cTotal * 100);
-  updateDonut('l1',   cb.l1   || 0, (cb.l1   || 0) / cTotal * 100);
-  updateDonut('l2',   cb.l2   || 0, (cb.l2   || 0) / cTotal * 100);
-  updateDonut('miss', cb.miss || 0, (cb.miss  || 0) / cTotal * 100);
-
-  const hitRate = ((cb.l0||0) + (cb.l1||0) + (cb.l2||0)) / cTotal * 100;
-  const hrEl = document.getElementById('cacheHitRate');
-  if (hrEl) hrEl.textContent = hitRate.toFixed(1) + '% hit rate';
-
-  // Activity feed
-  if (Array.isArray(stats.recent) && stats.recent.length > 0) {
-    document.getElementById('emptyActivity').style.display = 'none';
-    document.getElementById('activityFeedWrap').style.display = 'block';
-    const metaEl = document.getElementById('activityMeta');
-    if (metaEl) metaEl.textContent = nReq.toLocaleString() + ' requests';
-    renderFeedRows(stats.recent, false);
-  }
-
-  // QPS histogram update
-  if (Array.isArray(stats.recent)) {
-    stats.recent.forEach(r => {
-      const q = r.qps;
-      if (q != null && q >= 0 && q <= 1) {
-        qpsBuckets[Math.min(9, Math.floor(q * 10))]++;
+  if (!strategyChart) {
+    const ctx = document.getElementById('strategyChart').getContext('2d');
+    strategyChart = new Chart(ctx, {
+      type:'bar',
+      data:{ labels, datasets:[{ data:values, backgroundColor:colors, borderRadius:8, borderSkipped:false }] },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        animation:{ x:{ duration:700, easing:'easeOutQuart' } },
+        scales:{
+          x:{ grid:{color:gc}, ticks:{color:tc, callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v}, beginAtZero:true, border:{display:false} },
+          y:{ grid:{display:false}, ticks:{color:tc, font:{family:"'JetBrains Mono','Fira Code',monospace",size:11}}, border:{display:false} }
+        },
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:c=>' '+c.raw.toLocaleString()+' reqs'}}
+        }
       }
     });
-    if (qpsChart) {
-      qpsChart.data.datasets[0].data = qpsBuckets.slice();
-      qpsChart.update('none');
-    }
+  } else {
+    strategyChart.data.labels = labels;
+    strategyChart.data.datasets[0].data = values;
+    strategyChart.data.datasets[0].backgroundColor = colors;
+    strategyChart.update();
   }
 }
 
-// ── Feed rendering ───────────────────────────────────────────────────────────
-function renderFeedRows(rows, prepend) {
-  const feed = document.getElementById('activityFeed');
-  if (!feed) return;
+// ── Cache donuts (3 rings, afterDraw center text) ────────────────────────────
+function initDonuts() {
+  const bgArc = isDark() ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)';
+  function makeDonut(id, color, label) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    return new Chart(el, {
+      type:'doughnut',
+      data:{ datasets:[{ data:[0,100], backgroundColor:[color,bgArc], borderWidth:0, hoverOffset:0 }] },
+      options:{
+        responsive:false, cutout:'78%',
+        plugins:{
+          legend:{display:false}, tooltip:{enabled:false},
+          donutCenter:{ label, color }
+        }
+      }
+    });
+  }
+  donutCharts.l0 = makeDonut('donutL0', '#10B981', 'L0');
+  donutCharts.l1 = makeDonut('donutL1', '#6366F1', 'L1');
+  donutCharts.l2 = makeDonut('donutL2', '#8B5CF6', 'L2');
+}
 
+function updateDonut(key, pct) {
+  const ch = donutCharts[key]; if (!ch) return;
+  ch.data.datasets[0].data = [pct, Math.max(0,100-pct)];
+  ch.update('none');
+}
+
+// ── QPS histogram ────────────────────────────────────────────────────────────
+function initQpsChart() {
+  const ctx = document.getElementById('qpsChart').getContext('2d');
+  const labels = ['0.0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9'];
+  const colors = labels.map((_,i) => {
+    if (i >= 8) return 'rgba(16,185,129,0.70)';
+    if (i >= 6) return 'rgba(245,158,11,0.65)';
+    return 'rgba(239,68,68,0.55)';
+  });
+  const gc = tColor(0.04); const tc = tColor(0.5);
+
+  qpsChart = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'Requests', data:qpsBuckets.slice(), backgroundColor:colors, borderRadius:4, borderSkipped:false }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:tc}, border:{display:false} },
+        y:{ grid:{color:gc}, ticks:{color:tc, precision:0}, beginAtZero:true, border:{display:false} }
+      },
+      plugins:{
+        legend:{display:false},
+        annotation:{
+          annotations:{
+            floorLine:{
+              type:'line', scaleID:'x', value:'0.9',
+              borderColor:'rgba(99,102,241,0.7)', borderWidth:2, borderDash:[4,3],
+              label:{ content:'QPS floor 0.98', display:true, position:'start',
+                backgroundColor:'rgba(99,102,241,0.12)', color:'#6366F1',
+                font:{size:10, weight:'600'}, padding:{x:6,y:3} }
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// ── Update QPS/rollback card colours dynamically ──────────────────────────────
+function updateQpsCardColor(qps) {
+  const el = document.getElementById('valQps'); if (!el) return;
+  let color, glow;
+  if (qps >= 0.98) { color='var(--success)'; glow='var(--success-glow)'; }
+  else if (qps >= 0.95) { color='var(--warning)'; glow='var(--warning-soft)'; }
+  else { color='var(--danger)'; glow='var(--danger-soft)'; }
+  el.style.color = color; el.style.textShadow = `0 0 40px ${glow}`;
+}
+
+function updateRollbackColor(n) {
+  const el = document.getElementById('valRollbacks'); if (!el) return;
+  el.style.color      = n > 0 ? 'var(--warning)' : 'var(--text-tertiary)';
+  el.style.textShadow = n > 0 ? '0 0 40px var(--warning-soft)' : 'none';
+}
+
+// ── Apply stats ───────────────────────────────────────────────────────────────
+function applyStats(stats) {
+  if (!stats || typeof stats !== 'object') return;
+  const prev = prevStats;
+  prevStats  = stats;
+
+  const nCost = stats.cost_saved_usd  || 0;
+  const nTok  = stats.tokens_saved    || 0;
+  const nReq  = stats.total_requests  || 0;
+  const nQps  = stats.avg_qps         || 0;
+  const nRoll = stats.rollbacks        || 0;
+  const pCost = prev.cost_saved_usd   || 0;
+  const pTok  = prev.tokens_saved     || 0;
+  const pReq  = prev.total_requests   || 0;
+  const pQps  = prev.avg_qps          || 0;
+  const pRoll = prev.rollbacks         || 0;
+
+  // Hero values
+  animateValue(document.getElementById('valCost'),      pCost, nCost, 700);
+  animateValue(document.getElementById('valTokens'),    pTok,  nTok,  700);
+  animateValue(document.getElementById('valReqs'),      pReq,  nReq,  700);
+  animateValue(document.getElementById('valRollbacks'), pRoll, nRoll, 700);
+
+  if (nQps > 0) {
+    const qEl = document.getElementById('valQps');
+    animateValue(qEl, pQps, nQps, 700);
+    updateQpsCardColor(nQps);
+  } else {
+    document.getElementById('valQps').textContent = '—';
+  }
+  updateRollbackColor(nRoll);
+
+  // Deltas
+  renderDelta('deltaCost',      nCost, pCost);
+  renderDelta('deltaTokens',    nTok,  pTok);
+  renderDelta('deltaReqs',      nReq,  pReq);
+
+  // Sparklines
+  pushSpark('cost',      nCost);
+  pushSpark('tokens',    nTok);
+  pushSpark('reqs',      nReq);
+  pushSpark('qps',       nQps);
+  pushSpark('rollbacks', nRoll);
+
+  // Flash on change
+  const cards = document.querySelectorAll('.stat-card');
+  if (nTok !== pTok) flashCard(cards[1]);
+  if (nReq !== pReq) flashCard(cards[2]);
+
+  // Savings timeseries
+  if (savingsChart && Array.isArray(stats.timeseries) && stats.timeseries.length) {
+    savingsChart.data.labels = stats.timeseries.map(r => {
+      const d = new Date(r.ts_hour*3600*1000);
+      return currentWindow === '24h'
+        ? d.getUTCHours().toString().padStart(2,'0')+':00'
+        : (d.getUTCMonth()+1)+'/'+d.getUTCDate();
+    });
+    savingsChart.data.datasets[0].data = stats.timeseries.map(r=>r.tokens_saved||0);
+    savingsChart.update('none');
+    document.getElementById('savingsEmptyState').style.display = 'none';
+    document.getElementById('savingsChartWrap').style.display = '';
+  }
+
+  // Strategy
+  updateStrategyChart(stats.strategy_breakdown);
+
+  // Cache donuts
+  const cb = stats.cache_breakdown || {};
+  const tot = (cb.l0||0)+(cb.l1||0)+(cb.l2||0)+(cb.miss||0)||1;
+  updateDonut('l0', (cb.l0||0)/tot*100);
+  updateDonut('l1', (cb.l1||0)/tot*100);
+  updateDonut('l2', (cb.l2||0)/tot*100);
+  const hitPct = ((cb.l0||0)+(cb.l1||0)+(cb.l2||0))/tot*100;
+  const hrEl = document.getElementById('cacheHitRate');
+  if (hrEl) hrEl.textContent = hitPct.toFixed(1)+'% hit rate';
+
+  // QPS histogram
+  if (Array.isArray(stats.recent)) {
+    stats.recent.forEach(r => {
+      const q = r.qps;
+      if (q!=null && q>=0 && q<=1) qpsBuckets[Math.min(9,Math.floor(q*10))]++;
+    });
+    if (qpsChart) { qpsChart.data.datasets[0].data=qpsBuckets.slice(); qpsChart.update('none'); }
+  }
+
+  // Activity feed
+  if (Array.isArray(stats.recent) && stats.recent.length) {
+    document.getElementById('activityEmpty').style.display = 'none';
+    const listEl = document.getElementById('activityList');
+    listEl.style.display = '';
+    const metaEl = document.getElementById('activityMeta');
+    if (metaEl) metaEl.textContent = nReq.toLocaleString()+' requests';
+    renderFeed(stats.recent, false);
+  }
+
+  isFirstLoad = false;
+}
+
+// ── Feed render ───────────────────────────────────────────────────────────────
+function renderFeed(rows, prepend) {
+  const list = document.getElementById('activityList'); if (!list) return;
   const html = rows.map(r => {
-    const strats = (r.strategies || [])
-      .map(s => `<span class="strat-tag">${escHtml(s)}</span>`).join('');
-    const qv = r.qps != null
-      ? `<span class="qps-val ${qpsCls(r.qps)}">${r.qps.toFixed(4)}</span>`
-      : `<span class="qps-val" style="color:var(--text-tertiary)">—</span>`;
-    const cache = r.cache || 'miss';
-    const model = (r.model || '').replace(/^(gpt-|claude-)/,'').slice(0,18) || '—';
+    const saved   = (r.tokens_saved||0);
+    const cache   = r.cache||'miss';
+    const strats  = (r.strategies||[]).join(', ') || '—';
+    const ago     = r.ts ? timeAgo(r.ts) : '—';
+    const qv      = r.qps != null
+      ? `<span class="activity-qps ${qpsCls(r.qps)}">QPS ${r.qps.toFixed(3)}</span>`
+      : `<span class="activity-qps" style="color:var(--text-tertiary)">—</span>`;
     return `<div class="activity-row">
-      <div class="ar-cell"><span class="req-id">${escHtml((r.request_id||'').slice(0,8))}</span></div>
-      <div class="ar-cell ar-model" style="color:var(--text-primary)">${escHtml(model)}</div>
-      <div class="ar-cell">${classBadge(r.request_class)}</div>
-      <div class="ar-cell ar-strategies">${strats || '<span style="color:var(--text-tertiary)">—</span>'}</div>
-      <div class="ar-cell ar-tokens"><span class="tokens-val">${(r.tokens_saved||0).toLocaleString()}</span></div>
-      <div class="ar-cell">${qv}</div>
-      <div class="ar-cell"><span class="cache-chip cache-chip-${cache}">${cache}</span></div>
-      <div class="ar-cell"><span class="time-val">${r.ts ? timeAgo(r.ts) : '—'}</span></div>
+      ${classBadge(r.request_class)}
+      <span class="activity-saved">↓ ${saved.toLocaleString()} tokens</span>
+      ${qv}
+      <span class="activity-meta">${escHtml(ago)} · ${escHtml(strats)}</span>
     </div>`;
   }).join('');
 
   if (prepend) {
-    feed.insertAdjacentHTML('afterbegin', html);
-    while (feed.children.length > MAX_FEED_ROWS) {
-      feed.removeChild(feed.lastChild);
-    }
+    list.insertAdjacentHTML('afterbegin', html);
+    while (list.children.length > MAX_FEED) list.removeChild(list.lastChild);
   } else {
-    feed.innerHTML = html;
+    list.innerHTML = html;
   }
 }
 
-// ── Live event handler ────────────────────────────────────────────────────────
+// ── Live event ────────────────────────────────────────────────────────────────
 function handleLiveEvent(evt) {
-  if ((evt.tokens_saved || 0) > 0) {
-    const tokEl = document.getElementById('valTokens');
-    const cur = parseInt(tokEl.textContent.replace(/[^0-9]/g,'')) || 0;
-    animateValue(tokEl, cur, cur + evt.tokens_saved, 400);
-    const cards = document.querySelectorAll('.stat-card');
-    flashCard(cards[1]);
+  if ((evt.tokens_saved||0) > 0) {
+    const el = document.getElementById('valTokens');
+    const cur = parseFloat(el.textContent.replace(/[^0-9.]/g,''))||0;
+    animateValue(el, cur, cur+(evt.tokens_saved||0), 400);
+    flashCard(document.querySelectorAll('.stat-card')[1]);
   }
-  document.getElementById('emptyActivity').style.display = 'none';
-  document.getElementById('activityFeedWrap').style.display = 'block';
   const qv = evt.qps;
-  if (qv != null) {
-    qpsBuckets[Math.min(9, Math.floor(Math.min(1, Math.max(0, qv)) * 10))]++;
-    if (qpsChart) {
-      qpsChart.data.datasets[0].data = qpsBuckets.slice();
-      qpsChart.update('none');
-    }
+  if (qv!=null) {
+    qpsBuckets[Math.min(9,Math.floor(Math.min(1,Math.max(0,qv))*10))]++;
+    if (qpsChart) { qpsChart.data.datasets[0].data=qpsBuckets.slice(); qpsChart.update('none'); }
   }
-  renderFeedRows([evt], true);
+  document.getElementById('activityEmpty').style.display = 'none';
+  document.getElementById('activityList').style.display  = '';
+  renderFeed([evt], true);
   setTimeout(fetchStats, 600);
 }
 
 // ── SSE ───────────────────────────────────────────────────────────────────────
 function setLiveState(state, text) {
-  const ind = document.getElementById('liveIndicator');
-  const txt = document.getElementById('liveText');
-  if (ind) ind.dataset.state = state;
-  if (txt) txt.textContent  = text;
+  const el = document.getElementById('liveEl');
+  const tx = document.getElementById('liveText');
+  if (el) el.dataset.state = state;
+  if (tx) tx.textContent  = text;
 }
 
 function connectSSE() {
-  if (sse) { sse.close(); sse = null; }
+  if (sse) { sse.close(); sse=null; }
   clearTimeout(reconnectTimer);
-  setLiveState('connecting', 'Connecting');
-
+  setLiveState('connecting','Connecting…');
   try {
     sse = new EventSource('/api/dashboard/stream');
-    sse.onopen = () => setLiveState('connected', 'Live');
-    sse.onmessage = (evt) => {
+    sse.onopen    = () => setLiveState('connected','Live');
+    sse.onmessage = evt => {
       try {
-        const data = JSON.parse(evt.data);
-        if (data && typeof data === 'object' && !data.error) {
-          if (data.request_id) handleLiveEvent(data);
-          else applyStats(data);
+        const d = JSON.parse(evt.data);
+        if (d && typeof d==='object' && !d.error) {
+          if (d.request_id) handleLiveEvent(d); else applyStats(d);
         }
       } catch(_) {}
     };
     sse.onerror = () => {
-      setLiveState('error', 'Reconnecting');
-      sse.close(); sse = null;
-      reconnectTimer = setTimeout(connectSSE, 4000);
+      setLiveState('error','Disconnected');
+      sse.close(); sse=null;
+      reconnectTimer = setTimeout(connectSSE, 5000);
     };
   } catch(_) {
-    setLiveState('error', 'Offline');
+    setLiveState('error','Offline');
     reconnectTimer = setTimeout(connectSSE, 5000);
   }
 }
 
-// ── fetchStats ────────────────────────────────────────────────────────────────
+// ── Fetch ─────────────────────────────────────────────────────────────────────
 async function fetchStats() {
   try {
-    const resp = await fetch(`/api/dashboard/stats?window=${currentWindow}`);
-    if (resp.ok) applyStats(await resp.json());
+    const r = await fetch(`/api/dashboard/stats?window=${currentWindow}`);
+    if (r.ok) applyStats(await r.json());
   } catch(_) {}
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
-Chart.defaults.color       = chartColor(0.35);
-Chart.defaults.borderColor = chartColor(0.04);
-Chart.defaults.font.family = "'Inter var','Inter',system-ui,sans-serif";
-Chart.defaults.font.size   = 11;
-
 initSegControl();
 initSparklines();
 initSavingsChart();
 initDonuts();
 initQpsChart();
-updateChartWindowLabel();
+
 connectSSE();
 fetchStats();
-
 setInterval(fetchStats, 30000);
+
+// Lucide icons (must be last, after DOM is ready)
+lucide.createIcons();
 </script>
 </body>
 </html>
