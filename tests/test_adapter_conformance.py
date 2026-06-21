@@ -1,5 +1,5 @@
 """
-§8.3 Adapter conformance — round-trip identity for all 6 adapters.
+§8.3 Adapter conformance — round-trip identity for all 9 adapters.
 
 For every canned ICR and every adapter:
     body  = adapter.from_icr(icr)
@@ -11,7 +11,7 @@ Assert:
     - system text preserved
     - model preserved
 
-25 canned ICRs × 6 adapters = 150 parametrised assertions.
+25 canned ICRs × 9 adapters = 225 parametrised assertions.
 """
 from __future__ import annotations
 
@@ -24,6 +24,9 @@ from itol.adapters.mistral import MistralAdapter
 from itol.adapters.groq import GroqAdapter
 from itol.adapters.ollama import OllamaAdapter
 from itol.adapters.cohere import CohereAdapter
+from itol.adapters.gemini import GeminiAdapter
+from itol.adapters.deepseek import DeepSeekAdapter
+from itol.adapters.openrouter import OpenRouterAdapter
 
 
 # ---------------------------------------------------------------------------
@@ -112,6 +115,9 @@ ADAPTERS = [
     GroqAdapter(),
     OllamaAdapter(),
     CohereAdapter(),
+    GeminiAdapter(),
+    DeepSeekAdapter(),
+    OpenRouterAdapter(),
 ]
 
 ADAPTER_IDS = [a.name for a in ADAPTERS]
@@ -233,3 +239,81 @@ def test_ollama_adapter_is_concise() -> None:
     src = inspect.getsource(OllamaAdapter)
     lines = [l for l in src.splitlines() if l.strip() and not l.strip().startswith("#")]
     assert len(lines) <= 20, f"OllamaAdapter has {len(lines)} non-blank/non-comment lines"
+
+
+def test_gemini_adapter_is_concise() -> None:
+    import inspect
+    from itol.adapters.gemini import GeminiAdapter
+    src = inspect.getsource(GeminiAdapter)
+    lines = [l for l in src.splitlines() if l.strip() and not l.strip().startswith("#")]
+    assert len(lines) <= 20, f"GeminiAdapter has {len(lines)} non-blank/non-comment lines"
+
+
+def test_deepseek_adapter_is_concise() -> None:
+    import inspect
+    from itol.adapters.deepseek import DeepSeekAdapter
+    src = inspect.getsource(DeepSeekAdapter)
+    lines = [l for l in src.splitlines() if l.strip() and not l.strip().startswith("#")]
+    assert len(lines) <= 20, f"DeepSeekAdapter has {len(lines)} non-blank/non-comment lines"
+
+
+def test_openrouter_adapter_is_concise() -> None:
+    import inspect
+    from itol.adapters.openrouter import OpenRouterAdapter
+    src = inspect.getsource(OpenRouterAdapter)
+    lines = [l for l in src.splitlines() if l.strip() and not l.strip().startswith("#")]
+    assert len(lines) <= 20, f"OpenRouterAdapter has {len(lines)} non-blank/non-comment lines"
+
+
+# ---------------------------------------------------------------------------
+# New-adapter invariants: capabilities contract
+# ---------------------------------------------------------------------------
+
+def test_gemini_capabilities() -> None:
+    caps = GeminiAdapter().capabilities()
+    assert caps["native_prompt_cache"] == "none"
+    assert caps["cache_read_discount"] == 0.0
+    assert caps["max_context"] == 1_048_576
+
+
+def test_deepseek_capabilities() -> None:
+    caps = DeepSeekAdapter().capabilities()
+    assert caps["native_prompt_cache"] == "none"
+    assert caps["cache_read_discount"] == 0.0
+    assert caps["max_context"] == 128_000
+
+
+def test_openrouter_capabilities() -> None:
+    caps = OpenRouterAdapter().capabilities()
+    assert caps["native_prompt_cache"] == "none"
+    assert caps["cache_read_discount"] == 0.0
+    assert caps["max_context"] == 200_000
+
+
+def test_gemini_base_url() -> None:
+    assert GeminiAdapter().base_url == "https://generativelanguage.googleapis.com/v1beta/openai/"
+
+
+def test_deepseek_base_url() -> None:
+    assert DeepSeekAdapter().base_url == "https://api.deepseek.com/v1"
+
+
+def test_openrouter_base_url() -> None:
+    assert OpenRouterAdapter().base_url == "https://openrouter.ai/api/v1"
+
+
+def test_new_adapters_registered_in_init() -> None:
+    """GeminiAdapter, DeepSeekAdapter, OpenRouterAdapter importable from itol.adapters."""
+    from itol.adapters import GeminiAdapter, DeepSeekAdapter, OpenRouterAdapter
+    assert GeminiAdapter().name == "gemini"
+    assert DeepSeekAdapter().name == "deepseek"
+    assert OpenRouterAdapter().name == "openrouter"
+
+
+def test_entry_points_registered() -> None:
+    """All three new adapters appear in the itol.adapters entry-point group."""
+    import importlib.metadata
+    eps = {ep.name: ep for ep in importlib.metadata.entry_points(group="itol.adapters")}
+    assert "gemini"     in eps, "gemini not in entry_points"
+    assert "deepseek"   in eps, "deepseek not in entry_points"
+    assert "openrouter" in eps, "openrouter not in entry_points"

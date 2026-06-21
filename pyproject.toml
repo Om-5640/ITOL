@@ -24,12 +24,15 @@ itol = "itol.cli:main"
 # Built-in adapters registered so third-party packages can discover them via
 # importlib.metadata.entry_points(group="itol.adapters").
 # External adapter packages add their own entries here.
-openai    = "itol.adapters.openai_:OpenAIAdapter"
-anthropic = "itol.adapters.anthropic_:AnthropicAdapter"
-mistral   = "itol.adapters.mistral:MistralAdapter"
-groq      = "itol.adapters.groq:GroqAdapter"
-ollama    = "itol.adapters.ollama:OllamaAdapter"
-cohere    = "itol.adapters.cohere:CohereAdapter"
+openai      = "itol.adapters.openai_:OpenAIAdapter"
+anthropic   = "itol.adapters.anthropic_:AnthropicAdapter"
+mistral     = "itol.adapters.mistral:MistralAdapter"
+groq        = "itol.adapters.groq:GroqAdapter"
+ollama      = "itol.adapters.ollama:OllamaAdapter"
+cohere      = "itol.adapters.cohere:CohereAdapter"
+gemini      = "itol.adapters.gemini:GeminiAdapter"
+deepseek    = "itol.adapters.deepseek:DeepSeekAdapter"
+openrouter  = "itol.adapters.openrouter:OpenRouterAdapter"
 
 [tool.setuptools.packages.find]
 where = ["."]

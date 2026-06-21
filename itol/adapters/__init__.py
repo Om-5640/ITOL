@@ -7,6 +7,9 @@ from itol.adapters.mistral import MistralAdapter
 from itol.adapters.groq import GroqAdapter
 from itol.adapters.ollama import OllamaAdapter
 from itol.adapters.cohere import CohereAdapter
+from itol.adapters.gemini import GeminiAdapter
+from itol.adapters.deepseek import DeepSeekAdapter
+from itol.adapters.openrouter import OpenRouterAdapter
 
 __all__ = [
     "ProviderAdapter",
@@ -17,4 +20,7 @@ __all__ = [
     "GroqAdapter",
     "OllamaAdapter",
     "CohereAdapter",
+    "GeminiAdapter",
+    "DeepSeekAdapter",
+    "OpenRouterAdapter",
 ]
