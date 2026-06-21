@@ -14,6 +14,21 @@ dev = ["pytest>=8.0", "pytest-cov", "pytest-asyncio>=0.21", "httpx>=0.24", "fast
 embed = ["numpy>=1.24", "onnxruntime>=1.17", "huggingface-hub>=0.20", "transformers>=4.38"]
 embed-st = ["numpy>=1.24", "sentence-transformers>=2.7"]
 telemetry = ["prometheus-client>=0.19"]
+otel = ["opentelemetry-api>=1.20", "opentelemetry-sdk>=1.20"]
+
+[project.scripts]
+itol = "itol.cli:main"
+
+[project.entry-points."itol.adapters"]
+# Built-in adapters registered so third-party packages can discover them via
+# importlib.metadata.entry_points(group="itol.adapters").
+# External adapter packages add their own entries here.
+openai    = "itol.adapters.openai_:OpenAIAdapter"
+anthropic = "itol.adapters.anthropic_:AnthropicAdapter"
+mistral   = "itol.adapters.mistral:MistralAdapter"
+groq      = "itol.adapters.groq:GroqAdapter"
+ollama    = "itol.adapters.ollama:OllamaAdapter"
+cohere    = "itol.adapters.cohere:CohereAdapter"
 
 [tool.setuptools.packages.find]
 where = ["."]
