@@ -173,23 +173,28 @@ async def _run_real_pipeline(icr: Any, state: _AppState) -> dict:
     from itol.routing.matrix import MATRIX
     from itol.quality.qps import score_and_rollback
     from itol.icr import ConstraintManifest, SegmentSignals
+    from itol.telemetry.tracing import span as _span
 
     config = state.config
     store = state.store
 
     # Segment
     segments = segment(icr)
-    full_text = " ".join(s.text for s in segments)
 
-    # Signals
-    signals = extract_signals(segments)
+    with _span("analyze",
+               tenant_id=icr.tenant_id,
+               provider=icr.provider,
+               model=icr.model) as analyze_span:
+        # Signals
+        signals = extract_signals(segments)
 
-    # Classify
-    cls_result = classify(icr, config)
-    request_class = cls_result.request_class
+        # Classify
+        cls_result = classify(icr, config)
+        request_class = cls_result.request_class
+        analyze_span.set_attribute("request_class", request_class)
 
-    # Manifest
-    manifest = extract_manifest(icr, config)
+        # Manifest
+        manifest = extract_manifest(icr, config)
 
     # Build optimization context
     cls_cfg = config.class_configs.get(request_class)
@@ -225,7 +230,8 @@ async def _run_real_pipeline(icr: Any, state: _AppState) -> dict:
     for strat in strategies:
         try:
             if strat.applies(icr, current_segments, ctx):
-                new_segs, report = strat.apply(icr, current_segments, ctx)
+                with _span(f"optimize.{strat.strategy_id}"):
+                    new_segs, report = strat.apply(icr, current_segments, ctx)
                 current_segments = new_segs
                 all_reports.append(report)
         except Exception:
@@ -233,13 +239,16 @@ async def _run_real_pipeline(icr: Any, state: _AppState) -> dict:
 
     # QPS gate
     quality_cfg = config.quality
-    score_result = score_and_rollback(
-        icr=icr,
-        strategy_reports=all_reports,
-        manifest=manifest,
-        quality_cfg=quality_cfg,
-        optimised_segments=current_segments,
-    )
+    with _span("quality_gate") as qg_span:
+        score_result = score_and_rollback(
+            icr=icr,
+            strategy_reports=all_reports,
+            manifest=manifest,
+            quality_cfg=quality_cfg,
+            optimised_segments=current_segments,
+        )
+        qg_span.set_attribute("qps", score_result.qps_result.qps or 0.0)
+        qg_span.set_attribute("use_raw", score_result.use_raw)
 
     tokens_after = sum(s.token_count for s in (score_result.segments or current_segments) if s.token_count)
     tokens_saved = max(0, tokens_before - tokens_after)
@@ -501,6 +510,8 @@ def create_app(
     # Shared request handler
     # -----------------------------------------------------------------------
     async def _handle_request(request: Request, dialect: str) -> Response:
+        from itol.telemetry.tracing import span as _span
+
         st: _AppState = request.app.state.itol
         request_id = str(uuid.uuid4())
         t_start = time.time()
@@ -536,44 +547,56 @@ def create_app(
         strategies_applied: list[str] = []
         rollback_stage: str | None = None
 
-        try:
-            # Build ICR
-            if dialect == "openai":
-                icr = _icr_from_openai(body)
-            else:
-                icr = _icr_from_anthropic(body)
+        with _span("itol.request",
+                   request_id=request_id,
+                   dialect=dialect,
+                   model=body.get("model", "")) as req_span:
 
-            # Run pipeline (or injected override)
-            _pipeline = st.pipeline_fn or _run_real_pipeline
-            result = await _pipeline(icr, st)
+            try:
+                # Build ICR
+                if dialect == "openai":
+                    icr = _icr_from_openai(body)
+                else:
+                    icr = _icr_from_anthropic(body)
 
-            body_to_send = result.get("optimized_body", body)
-            tokens_saved = result.get("tokens_saved", 0)
-            qps_val = result.get("qps", 1.0)
-            cache_level = result.get("cache_result", "miss")
-            strategies_applied = result.get("strategies_applied", [])
-            rollback_stage = result.get("rollback_stage")
+                req_span.set_attribute("tenant_id", "default")
 
-        except Exception:
-            # CR-16: bypass — forward original body unchanged
-            body_to_send = body
-            tokens_saved = 0
-            qps_val = 1.0
-            cache_level = "miss"
+                # Run pipeline (or injected override)
+                _pipeline = st.pipeline_fn or _run_real_pipeline
+                result = await _pipeline(icr, st)
 
-        # Dispatch to upstream
-        try:
-            upstream_body, status_code = await _dispatch_upstream(
-                url=upstream_url,
-                headers=forward_headers,
-                body=body_to_send,
-                dispatch_fn=st.dispatch_fn,
-            )
-        except Exception as exc:
-            return JSONResponse(
-                {"error": f"upstream dispatch failed: {exc}"},
-                status_code=502,
-            )
+                body_to_send = result.get("optimized_body", body)
+                tokens_saved = result.get("tokens_saved", 0)
+                qps_val = result.get("qps", 1.0)
+                cache_level = result.get("cache_result", "miss")
+                strategies_applied = result.get("strategies_applied", [])
+                rollback_stage = result.get("rollback_stage")
+
+                req_span.set_attribute("tokens_saved", tokens_saved)
+                req_span.set_attribute("qps", qps_val)
+                req_span.set_attribute("cache_result", cache_level)
+
+            except Exception:
+                # CR-16: bypass — forward original body unchanged
+                body_to_send = body
+                tokens_saved = 0
+                qps_val = 1.0
+                cache_level = "miss"
+
+            # Dispatch to upstream
+            try:
+                with _span("dispatch", upstream_url=upstream_url):
+                    upstream_body, status_code = await _dispatch_upstream(
+                        url=upstream_url,
+                        headers=forward_headers,
+                        body=body_to_send,
+                        dispatch_fn=st.dispatch_fn,
+                    )
+            except Exception as exc:
+                return JSONResponse(
+                    {"error": f"upstream dispatch failed: {exc}"},
+                    status_code=502,
+                )
 
         latency_ms = (time.time() - t_start) * 1000
 
