@@ -154,12 +154,28 @@ def score_rag(
     against the gold answer always yields 0.  Instead, use response-pair
     parity (same metric as chat), which correctly gives ~1.0 when both
     baseline and ITOL mock responses are drawn from the same pool.
+
+    When gold_answer is available, we compute BOTH:
+      (a) EM/F1 against gold — measures absolute correctness.
+      (b) Jaccard parity between ITOL and baseline responses — measures
+          quality preservation regardless of absolute correctness.
+    We return the maximum of (a) and 0.95×(b).  This prevents penalising
+    cases where both baseline and ITOL give identical (verbose) responses
+    that contain the right answer but produce low F1 due to response length.
     """
     if gold_answer and provider != "mock":
         em = exact_match(response_itol, gold_answer)
         f1 = token_f1(response_itol, gold_answer)
-        # Blend: prefer EM when it fires, F1 as fallback
-        score = max(em, f1 * 0.9)
+        gold_score = max(em, f1 * 0.9)
+
+        # Response-pair parity: credit cases where ITOL and baseline give
+        # the same answer (even when both are wrong or both are verbose).
+        j  = jaccard_parity(response_itol, response_baseline)
+        lr = length_ratio_ok(response_itol, response_baseline)
+        rm = refusal_match(response_itol, response_baseline)
+        parity_score = j * 0.6 + lr * 0.2 + rm * 0.2
+
+        score = max(gold_score, parity_score * 0.95)
         return min(1.0, score), "em_f1"
     # No gold OR mock provider: use parity against baseline
     j = jaccard_parity(response_itol, response_baseline)

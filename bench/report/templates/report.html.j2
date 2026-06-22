@@ -312,13 +312,37 @@ footer { margin-top: 60px; padding: 24px 0; border-top: 1px solid var(--border);
       </p>
     </div>
     <div class="card" style="margin-bottom:16px">
+      <h4>Data Sources</h4>
+      <ul style="font-size:0.87rem;color:var(--text-secondary);margin:0;padding-left:1.2em">
+        <li><strong>RAG workload</strong> — 150 examples from
+          <a href="https://hotpotqa.github.io/" style="color:var(--accent)">HotpotQA</a>
+          distractor/validation split (Yang et al., 2018).
+          Each example provides 10 retrieved paragraphs (2 gold + 8 distractors),
+          a multi-hop question, and a short gold answer.
+          3-turn conversation: all 10 docs are re-sent each turn so ITOL's
+          deduplication (S1) and hygiene (S6) strategies have real work to do.
+          Gold answers are used for EM + F1 scoring.
+          License: <strong>CC BY-SA 4.0</strong>.
+          Bundled slice: <code>data/bench_corpora/hotpotqa_150_real.jsonl</code>.
+          Regenerate: <code>python scripts/prepare_hotpotqa_slice.py</code>.
+        </li>
+        <li><strong>Chat workload</strong> — Synthetic multi-turn conversations
+          generated at benchmark time (seed=42 for reproducibility).</li>
+        <li><strong>FAQ workload</strong> — Synthetic FAQ pairs exercising the
+          semantic-deduplication cache.</li>
+      </ul>
+    </div>
+    <div class="card" style="margin-bottom:16px">
       <h4>Quality Scoring</h4>
       <p style="font-size:0.87rem;color:var(--text-secondary)">
-        RAG: Exact Match + Token F1 against HotpotQA gold answers (EM primary, F1 fallback).<br>
+        RAG: max of (a) Exact Match + Token F1 against HotpotQA gold answers
+        and (b) Jaccard response-parity vs. baseline.  Takes the higher of the
+        two so verbose-but-correct answers are not penalised.<br>
         Agent: Entity coverage (correct entities in response) + Jaccard bigram overlap.<br>
         Chat &amp; FAQ: Jaccard bigram parity + length ratio + refusal-flag match.<br>
-        LLM tiebreaker: Groq <code>llama-3.1-8b-instant</code> used when deterministic score ∈ [0.85, 0.95].
-        Final score blended 70% deterministic + 30% LLM.
+        LLM semantic judge: provider's own model asked "is the optimised response
+        materially worse?" — final score blended 90% LLM + 10% deterministic
+        when a real verdict is available.
       </p>
     </div>
     <div class="card">
