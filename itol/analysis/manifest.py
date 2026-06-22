@@ -18,7 +18,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 from itol.icr import (
     ICR,
@@ -467,15 +467,37 @@ def extract_manifest(icr: ICR) -> ConstraintManifest:
 # CR-22 — polarity_guard integrity check  (§15.1)
 # ---------------------------------------------------------------------------
 
-def polarity_intact(manifest: ConstraintManifest, optimised_text: str) -> bool:
+def polarity_intact(
+    manifest: ConstraintManifest,
+    optimised_text: str,
+    optimised_segments: list[Any] | None = None,
+) -> bool:
     """
     CR-22: for every manifest item with a polarity_guard, verify the guard hash
     is identical in the optimised text.
 
-    Procedure: find the item's value in optimised_text, extract ±1 sentence
-    window, recompute polarity_guard, compare to stored hash.
-    Returns True only if ALL items pass (or have no guard to check).
+    When optimised_segments is provided, each item is checked against its
+    source segment's text (same scope used during manifest construction) rather
+    than the full concatenated text.  This prevents false negatives caused by
+    adjacent-segment content bleeding into the ±1-sentence window: e.g. when
+    S1 removes exact-duplicate document segments, the remaining copy's window
+    is unchanged, but the full-text window gains new neighbours from earlier
+    segments that flip the guard hash.  Checking per-segment restores the
+    construction-time scope.
+
+    Items whose source segment hash still exists in optimised_segments (i.e.
+    the segment was kept unchanged by every strategy) are trivially intact —
+    no lossless strategy can flip polarity inside unchanged content.
     """
+    # Build a lookup: segment_hash → segment text (for per-segment checking)
+    seg_text_by_hash: dict[str, str] = {}
+    if optimised_segments is not None:
+        for seg in optimised_segments:
+            h = getattr(seg, "segment_hash", None)
+            t = getattr(seg, "text", None) or ""
+            if h:
+                seg_text_by_hash[h] = t
+
     for item in manifest.items:
         if not item.polarity_guard:
             continue
@@ -483,12 +505,49 @@ def polarity_intact(manifest: ConstraintManifest, optimised_text: str) -> bool:
             # Item is missing entirely — coverage() catches that; not our check here
             continue
 
-        sents = _split_for_coverage(optimised_text)
-        item_idx: int | None = None
-        for i, s in enumerate(sents):
-            if item.value in s:
-                item_idx = i
-                break
+        # Prefer per-segment check: if the item's source segment is still in
+        # the optimised result, the negation context around the item is
+        # unchanged by construction (no strategy modified that segment).
+        source_hash = getattr(item, "source_segment_hash", None)
+        if source_hash and source_hash in seg_text_by_hash:
+            seg_text = seg_text_by_hash[source_hash]
+            if item.value not in seg_text:
+                # Item not in this segment anymore — fall through to full-text check
+                pass
+            else:
+                sents = split_sentences(seg_text)
+                item_idx: int | None = next(
+                    (i for i, s in enumerate(sents) if item.value in s), None
+                )
+                if item_idx is None:
+                    return False
+                lo = max(0, item_idx - 1)
+                hi = min(len(sents), item_idx + 2)
+                opt_window = " ".join(sents[lo:hi])
+                if compute_polarity_guard(opt_window) != item.polarity_guard:
+                    return False
+                continue  # checked; move to next item
+
+        # Fast path: if the manifest's governing_span survives in the optimised
+        # text, polarity is intact by construction.  compute_polarity_guard is a
+        # pure function of the span text, so same span → same hash.  This avoids
+        # false negatives caused by recomputing the window from the full text
+        # (which includes adjacent-segment sentences absent at construction time).
+        #
+        # We compare after whitespace normalisation: S6 (hygiene) collapses
+        # multi-space runs and strips trailing whitespace — that is its entire job
+        # and cannot change negation context — so a span that differs only in
+        # whitespace from the stored governing_span is still intact.
+        if item.governing_span:
+            _norm_span = " ".join(item.governing_span.split())
+            _norm_opt  = " ".join(optimised_text.split())
+            if _norm_span and _norm_span in _norm_opt:
+                continue  # governing span present (modulo whitespace) → intact
+
+        # Fallback: governing span was modified or removed.  Recompute the window
+        # from the full text using the same sentence splitter as manifest construction.
+        sents = split_sentences(optimised_text)
+        item_idx = next((i for i, s in enumerate(sents) if item.value in s), None)
 
         if item_idx is None:
             return False

@@ -109,6 +109,7 @@ def compute_qps(
     min_window_fidelity: float = 1.0,
     coverage_margin: float = 1.0,
     s7_participated: bool = False,
+    optimised_segments: list | None = None,
 ) -> QPSResult:
     """
     §5.2 QPS formula with §15.2 min_window_fidelity substitution.
@@ -126,11 +127,16 @@ def compute_qps(
     Floors (read from quality_cfg — never hardcoded):
       • 0.99 when S7 participated
       • 0.98 otherwise
+
+    optimised_segments: when provided, polarity_intact checks each item against
+    its source segment text (same scope as manifest construction) rather than
+    the full concatenated text, preventing false negatives from cross-segment
+    context bleed (e.g. after S1 removes exact-duplicate document blocks).
     """
     from itol.analysis.manifest import polarity_intact as _polarity_intact
 
     cov = manifest.coverage(optimised_text)
-    pol_ok = _polarity_intact(manifest, optimised_text)
+    pol_ok = _polarity_intact(manifest, optimised_text, optimised_segments)
 
     if cov < 1.0 or not pol_ok:
         qps = 0.0
@@ -276,6 +282,7 @@ def _score_and_rollback_inner(
         min_window_fidelity=min_window_fidelity,
         coverage_margin=coverage_margin,
         s7_participated=s7_participated,
+        optimised_segments=optimised_segments,
     )
 
     if result.passed:
@@ -308,6 +315,7 @@ def _score_and_rollback_inner(
             min_window_fidelity=min_window_fidelity,
             coverage_margin=coverage_margin,
             s7_participated=s7_still_active,
+            optimised_segments=snapshot,
         )
         candidate_result.rollback_stages_tried = stages_tried[:]
         candidate_result.rollback_stage_passed = strategy_id if candidate_result.passed else None

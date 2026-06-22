@@ -265,6 +265,13 @@ def _qualifiers_survive(item_value: str, governing_span: str, opt_text: str) -> 
     if not qualifier_tokens:
         return True
 
+    # Fast path: if the governing_span survives verbatim (modulo whitespace,
+    # e.g. S6 normalisation), all qualifier tokens are present inside it by
+    # construction — no sentence-window search is needed.
+    _norm_span = " ".join(governing_span.split())
+    if _norm_span and _norm_span in " ".join(opt_text.split()):
+        return True
+
     sents = _split_for_coverage(opt_text)
     item_idx: int | None = None
     for i, s in enumerate(sents):
@@ -324,12 +331,18 @@ class ConstraintManifest:
         """
         if not self.items:
             return 1.0
+        # Normalise once: S6 (always-applied hygiene) collapses internal whitespace
+        # runs, so manifest item values extracted from the raw text may contain
+        # double spaces that no longer exist verbatim in the optimised text.
+        # Comparing normalised forms avoids false-negative mismatches.
+        norm_opt = " ".join(optimised_text.split())
         found = 0
         for item in self.items:
-            if item.value not in optimised_text:
+            norm_val = " ".join(item.value.split())
+            if norm_val not in norm_opt:
                 continue
             if item.governing_span and not _qualifiers_survive(
-                item.value, item.governing_span, optimised_text
+                norm_val, item.governing_span, optimised_text
             ):
                 continue
             found += 1
