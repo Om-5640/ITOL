@@ -143,9 +143,15 @@ def cmd_run(args) -> int:
 
 
 async def _run_all(config: BenchConfig, args) -> int:
+    from datetime import datetime, timezone
     from bench.workloads import load_workload
     from bench.runners.baseline import run_baseline
     from bench.runners.itol_run import run_itol
+    from bench.metrics import successful_ids, result_path
+
+    strict_n = getattr(args, "strict_n", False)
+    requested_n = config.n_for_workload()
+    shortfalls: list[dict] = []
 
     def progress(workload, provider, run_type, i, total):
         pct = int(100 * i / total)
@@ -186,10 +192,44 @@ async def _run_all(config: BenchConfig, args) -> int:
             if baseline and itol:
                 _print_quick_summary(baseline, itol, wl_name, prov_name)
 
+            # Sample-size check (Bug 4): count CUMULATIVE successful samples on disk.
+            date_str = datetime.now(timezone.utc).strftime("%Y%m%d")
+            bl_path = result_path(wl_name, prov_name, date_str, config.output_dir)
+            it_path = result_path(wl_name, f"{prov_name}_itol", date_str, config.output_dir)
+            n_ok = min(len(successful_ids(bl_path)), len(successful_ids(it_path)))
+            if n_ok < requested_n:
+                shortfalls.append({
+                    "workload": wl_name, "provider": prov_name,
+                    "requested": requested_n, "achieved": n_ok,
+                })
+                print(f"  !! SHORTFALL: only {n_ok}/{requested_n} successful "
+                      f"(rate limits / quota). Re-run to retry failed samples.")
+
+    # Persist shortfalls for the report to surface (Bug 4: warn loudly).
+    _write_shortfalls(config, shortfalls, requested_n)
+
     print("\nAll runs complete.")
     print(f"Results in: {config.output_dir}/")
+    if shortfalls:
+        print(f"\n!! {len(shortfalls)} workload/provider combo(s) fell short of "
+              f"n={requested_n}. See report for details.")
+        if strict_n:
+            print("   --strict-n set: exiting with error.")
+            return 2
+        print("   Default mode: re-run the same command to retry the failed samples.")
     print("Generate report with: python -m bench report")
     return 0
+
+
+def _write_shortfalls(config, shortfalls: list[dict], requested_n: int) -> None:
+    """Write shortfall summary JSON so the report can warn about sample-size gaps."""
+    import json
+    config.output_dir.mkdir(parents=True, exist_ok=True)
+    path = config.output_dir / "shortfalls.json"
+    path.write_text(json.dumps({
+        "requested_n": requested_n,
+        "shortfalls": shortfalls,
+    }, indent=2), encoding="utf-8")
 
 
 def _print_quick_summary(baseline, itol, workload, provider):
@@ -330,6 +370,9 @@ def build_parser() -> argparse.ArgumentParser:
                     help="Comma-separated: rag,agent,chat,faq,all (default: all)")
     ru.add_argument("--n", type=int, default=150, help="Samples per workload (default: 150)")
     ru.add_argument("--no-resume", action="store_true", help="Don't resume from existing JSONL")
+    ru.add_argument("--strict-n", action="store_true",
+                    help="Fail (exit 2) if any workload/provider does not reach the requested n "
+                         "successful samples. Default: retry failures across runs, warn on shortfall.")
 
     # report
     rep = sub.add_parser("report", help="Generate HTML report from existing JSONL data")

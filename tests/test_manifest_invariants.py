@@ -309,6 +309,34 @@ class TestFormatExtraction:
         formats = [i.value for i in m.items if i.item_type == ManifestItem.ItemType.FORMAT]
         assert any("status" in f or "result" in f for f in formats)
 
+    def test_possessive_apostrophe_not_a_quoted_literal(self):
+        """
+        §5.1/§15.1: possessive apostrophes ("James's", "Charles's") must NOT be
+        treated as single-quote delimiters. Otherwise the regex greedily spans
+        the text between two possessives, producing a multi-sentence FORMAT item
+        that fails polarity_intact (value not contained in a single sentence),
+        hard-gating QPS to 0 and forcing a spurious full rollback.
+        """
+        text = (
+            "James's work continues to influence biology today. "
+            "Document 2: Charles's research led to natural selection."
+        )
+        icr = _icr(user_text=text)
+        m = extract_manifest(icr)
+        formats = [i.value for i in m.items if i.item_type == ManifestItem.ItemType.FORMAT]
+        # No FORMAT item may span a sentence boundary (period or newline).
+        for f in formats:
+            assert "." not in f and "\n" not in f, f"Multi-sentence FORMAT item leaked: {f!r}"
+        # And polarity must hold on the unchanged text (no false rollback trigger).
+        assert polarity_intact(m, text), "polarity_intact false-negative on unchanged prose"
+
+    def test_legitimate_single_quoted_literal_still_extracted(self):
+        """A real single-quoted literal (not a possessive) is still captured."""
+        icr = _icr(system_text="Respond with the status 'ACTIVE' exactly.")
+        m = extract_manifest(icr)
+        formats = [i.value for i in m.items if i.item_type == ManifestItem.ItemType.FORMAT]
+        assert any("ACTIVE" in f for f in formats), f"Format items: {formats}"
+
 
 # ===========================================================================
 # extract_manifest — query term extraction  (§5.1)

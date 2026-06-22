@@ -110,7 +110,38 @@ def load_results(base_dir: Path, workload: str | None = None,
                         results.append(BenchResult.from_dict(json.loads(line)))
                     except Exception:
                         pass
-    return results
+    # Deduplicate keeping the LAST line per (run_type, provider, workload, sample_id).
+    # A retried sample (previously errored, now succeeded) appears twice; the last
+    # write wins so counts and quality reflect the successful attempt.
+    deduped: dict[tuple, BenchResult] = {}
+    for r in results:
+        deduped[(r.run_type, r.provider, r.workload, r.sample_id)] = r
+    return list(deduped.values())
+
+
+def successful_ids(path: Path) -> set[str]:
+    """
+    Return sample_ids written to a JSONL file that completed WITHOUT error.
+
+    Used for resume: errored samples are NOT counted as done, so a subsequent
+    run retries them (until they succeed or the daily quota is exhausted).
+    Keeps the last attempt per sample_id (a later success supersedes an
+    earlier error).
+    """
+    if not path.exists():
+        return set()
+    last_error: dict[str, bool] = {}
+    with open(path, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                d = json.loads(line)
+                last_error[d["sample_id"]] = d.get("error") is not None
+            except Exception:
+                pass
+    return {sid for sid, errored in last_error.items() if not errored}
 
 
 def completed_ids(path: Path) -> set[str]:

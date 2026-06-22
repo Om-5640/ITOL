@@ -83,7 +83,7 @@ _BRIDGE_TEMPLATES = [
 def _make_doc(topic: tuple, pronoun: str = "They") -> str:
     name, contribution, field, country, discovery = topic
     name_short = name.split()[0]
-    dates = f"1{random.randint(6, 9)}{random.randint(0, 9)}{random.randint(0, 9)}–"
+    dates = f"1{random.randint(6, 9)}{random.randint(0, 9)}{random.randint(0, 9)}-"
     dates += f"1{random.randint(9, 9)}{random.randint(0, 9)}{random.randint(0, 9)}"
     return _DOC_TEMPLATE.format(
         title=name, dates=dates, field=field, pronoun=pronoun,

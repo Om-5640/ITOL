@@ -180,12 +180,16 @@ def _generate_trajectory(task_desc: str, topic: str, rng: random.Random,
     })
     messages.append({
         "role": "tool", "tool_call_id": call_id_2, "name": "lookup_entity",
+        # Pretty-printed JSON, as real agent frameworks (LangChain, etc.) emit.
+        # S6 hygiene losslessly minifies this indentation/whitespace.
         "content": json.dumps({
             "entity": topic,
             "summary": f"{topic} is a rapidly evolving domain with broad applications.",
             "key_metrics": {"growth_rate": "23% YoY", "market_size": "$4.2B", "key_players": 12},
             "recent_events": [f"Major {topic} breakthrough announced in June 2026"],
-        }),
+            "related_topics": ["research", "industry adoption", "future outlook"],
+            "confidence": 0.87,
+        }, indent=2),
     })
 
     # Turn 3: refinement search (supersedes turn 1 if that was marked outdated)

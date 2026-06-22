@@ -324,8 +324,15 @@ def _extract_normative_clauses(
 # Format specifier extraction  (§5.1)
 # ---------------------------------------------------------------------------
 
-# Quoted literals (single or double quotes, at least 2 chars inside)
-_QUOTED = re.compile(r'"[^"]{2,}"|\'[^\']{2,}\'')
+# Quoted literals (single or double quotes, at least 2 chars inside).
+# Single-quote branch: the opening quote must NOT be preceded by a letter,
+# otherwise possessives/contractions ("James's", "don't") are mistaken for
+# quote delimiters and the regex greedily captures the entire span between two
+# apostrophes — often spanning multiple sentences. Such a multi-sentence FORMAT
+# item later fails polarity_intact (its value is not contained in any single
+# sentence), hard-gating QPS to 0 and forcing a spurious full rollback.
+# Neither branch may span a newline (format literals are single-line tokens).
+_QUOTED = re.compile(r'"[^"\n]{2,}"|(?<![A-Za-z])\'[^\'\n]{2,}\'')
 # JSON keys: "key": pattern
 _JSON_KEY = re.compile(r'"(\w[\w_-]*)"(?=\s*:)')
 # Regex-like patterns: /pattern/ or common regex metachar sequences

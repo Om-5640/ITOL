@@ -87,6 +87,9 @@ def generate_html(
 
     baseline_results, itol_results = _load_all_results(results_dir)
 
+    # Sample-size shortfalls (Bug 4): surfaced loudly in the report header.
+    shortfall_data = _load_shortfalls(results_dir)
+
     # Aggregate per (workload, provider)
     workloads_in_data = {r.workload for r in baseline_results + itol_results}
     providers_in_data = {r.provider.replace("_itol", "") for r in baseline_results + itol_results}
@@ -107,8 +110,12 @@ def generate_html(
             it = [r for r in itol_results     if r.workload == wl_name and r.provider.replace("_itol", "") == prov_name]
 
             if not bl and not it:
-                # Generate placeholder for smoke/empty runs
-                bl, it = _make_placeholder_data(wl_name, prov_name)
+                if config.smoke:
+                    # Smoke mode: show synthetic placeholder so report renders completely
+                    bl, it = _make_placeholder_data(wl_name, prov_name)
+                else:
+                    # Real run: skip combinations with no data (don't show fake numbers)
+                    continue
 
             stats = aggregate(bl, it, wl_name, prov_name)
             all_stats.append(stats)
@@ -128,15 +135,19 @@ def generate_html(
 
     summary = blended_summary(all_stats) or _placeholder_summary()
 
-    # Scale extrapolation
-    active_prov_cfgs = [PROVIDERS[p] for p in (providers_in_data or ["mock"]) if p in PROVIDERS]
+    # Scale extrapolation — exclude mock (no real pricing for illustration)
+    real_providers = [p for p in providers_in_data if p != "mock"]
+    active_prov_cfgs = [PROVIDERS[p] for p in real_providers if p in PROVIDERS]
+    if not active_prov_cfgs:
+        # No real provider data yet — use groq as illustration placeholder
+        active_prov_cfgs = [PROVIDERS["groq"]]
     scale_rows = scale_table(
         summary.get("token_reduction_pct", 28.0),
-        active_prov_cfgs or [PROVIDERS["mock"]],
+        active_prov_cfgs,
     )
 
-    # Provider table
-    prov_configs = [PROVIDERS[p] for p in (providers_in_data or ["mock"]) if p in PROVIDERS]
+    # Provider table (methodology section) — also exclude mock
+    prov_configs = active_prov_cfgs
 
     context = {
         "title": "ITOL Benchmark Report",
@@ -153,7 +164,7 @@ def generate_html(
         "workloads_tested": list(workloads_in_data or {"faq"}),
         "n_total": sum(s.n_itol for s in all_stats),
         "n_per_combo": config.n_for_workload(),
-        "pricing_note": "Groq: $0.59/$0.79 /MTok in/out (llama-3.1-70b-versatile, June 2026). "
+        "pricing_note": "Groq: $0.59/$0.79 /MTok in/out (llama-3.3-70b-versatile, June 2026). "
                         "Mistral: $0.20/$0.60 /MTok (mistral-small-latest). "
                         "Cohere: $0.15/$0.60 /MTok (command-r).",
         "reproduce_cmd": (
@@ -161,6 +172,8 @@ def generate_html(
             "--workloads rag,agent,chat,faq --n 150"
         ),
         "is_smoke": config.smoke,
+        "shortfalls": shortfall_data.get("shortfalls", []),
+        "shortfall_requested_n": shortfall_data.get("requested_n", config.n_for_workload()),
         "honest_limitations": [
             "Public benchmark workloads ≠ your production workload. "
             "Savings vary by prompt structure, context length, and task type.",
@@ -206,6 +219,17 @@ def _get_itol_version() -> str:
         return importlib.metadata.version("itol")
     except Exception:
         return "dev"
+
+
+def _load_shortfalls(results_dir: Path) -> dict:
+    """Load shortfalls.json written by the run command (empty dict if absent)."""
+    path = results_dir / "shortfalls.json"
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
 
 
 def _make_placeholder_data(workload: str, provider: str) -> tuple[list[BenchResult], list[BenchResult]]:

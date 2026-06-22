@@ -10,3 +10,11 @@ venv/
 *.db-shm
 *.db-wal
 ~/.itol/
+.env
+data/bench_results/
+bench_smoke_stdout.txt
+bench_smoke_stderr.txt
+run_out.txt
+run_err.txt
+diag_*.py
+diag_*.txt

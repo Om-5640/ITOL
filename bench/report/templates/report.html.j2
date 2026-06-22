@@ -239,6 +239,20 @@ footer { margin-top: 60px; padding: 24px 0; border-top: 1px solid var(--border);
 </div>
 {% endif %}
 
+{% if shortfalls %}
+<div class="smoke-banner" style="background:rgba(248,113,113,0.12);border-color:var(--danger);color:var(--danger)">
+  ⚠ <strong>Sample-size shortfall</strong> — {{ shortfalls|length }} workload/provider
+  combination(s) did not reach the requested n={{ shortfall_requested_n }} successful samples
+  (free-tier rate limits / daily quota). Confidence intervals on the affected rows are wider.
+  Re-run the same command to retry failed samples.
+  <ul style="margin:8px 0 0 18px;font-size:0.85rem">
+    {% for sf in shortfalls %}
+    <li>{{ sf.workload }} × {{ sf.provider }}: {{ sf.achieved }}/{{ sf.requested }} samples</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
 <!-- Executive Summary -->
 <section class="exec-summary">
   <h2>Executive Summary</h2>
@@ -248,8 +262,12 @@ footer { margin-top: 60px; padding: 24px 0; border-top: 1px solid var(--border);
       <div class="label">Blended Token Reduction</div>
     </div>
     <div class="big-num savings">
-      <div class="value">${{ "%.2f"|format(summary.cost_saved_pct) }}%</div>
+      <div class="value">${{ "%.2f"|format(summary.cost_saved_usd) }}</div>
       <div class="label">Equivalent Cost Saved<br>(paid-tier pricing)</div>
+    </div>
+    <div class="big-num savings">
+      <div class="value">{{ summary.cost_saved_pct }}%</div>
+      <div class="label">Cost Reduction<br>(paid-tier equivalent)</div>
     </div>
     <div class="big-num quality">
       <div class="value">{{ summary.quality_parity }}</div>

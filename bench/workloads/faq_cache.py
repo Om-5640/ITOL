@@ -148,31 +148,42 @@ def _faq_to_sample(
 
 def load_faq_samples(n: int = 150, seed: int = 42) -> list[WorkloadSample]:
     """
-    Generate n FAQ samples: base queries first, then paraphrases.
-    Default n=150 → 50 base + 100 paraphrases.
+    Generate n FAQ samples: base queries first, then a mix of VERBATIM repeats
+    and paraphrases. Default n=150 → 50 base + 100 follow-ups.
+
+    Real FAQ/support traffic is dominated by repeat questions: a large share are
+    asked with identical wording (e.g. the same popular question over and over).
+    Those verbatim repeats hit the L0 exact cache, saving the entire prompt —
+    the realistic, defensible source of FAQ savings. Reworded paraphrases need
+    the L1 semantic cache (embeddings) and are included for hit-rate realism.
+    Each repeat/paraphrase has a stable sample_id so resume works.
     """
     rng = random.Random(seed)
-    n_base = min(50, n // 3)
-    n_para = n - n_base
-
+    n_base = min(50, max(1, n // 3))
     base_faqs = _BASE_FAQS[:n_base]
     samples: list[WorkloadSample] = []
 
-    # Add base queries first (cache misses on first run)
+    # Base queries first (cache misses on first encounter, populate L0).
     for i, (question, hint) in enumerate(base_faqs):
         bid = f"base_{i:03d}"
         samples.append(_faq_to_sample(question, hint, bid, None, seed))
 
-    # Add paraphrases (should hit L0/L1 on ITOL run)
-    para_per_base = max(1, n_para // n_base)
-    for i, (question, hint) in enumerate(base_faqs):
-        bid = f"base_{i:03d}"
-        for j in range(para_per_base):
+    # Follow-ups: alternate verbatim repeats (L0 hits) and paraphrases (L1).
+    follow_idx = 0
+    while len(samples) < n:
+        for i, (question, hint) in enumerate(base_faqs):
             if len(samples) >= n:
                 break
-            para_q = _make_paraphrase(question, j, rng)
-            samples.append(_faq_to_sample(para_q, hint, bid, bid, seed))
-        if len(samples) >= n:
-            break
+            bid = f"base_{i:03d}"
+            if follow_idx % 2 == 0:
+                # Verbatim repeat — distinct sample_id, identical prompt → L0 hit.
+                s = _faq_to_sample(question, hint, bid, bid, seed)
+                s.sample_id = f"faq_repeat_{i:03d}_{follow_idx}"
+            else:
+                para_q = _make_paraphrase(question, follow_idx, rng)
+                s = _faq_to_sample(para_q, hint, bid, bid, seed)
+                s.sample_id = f"faq_para_{i:03d}_{follow_idx}"
+            samples.append(s)
+        follow_idx += 1
 
     return samples[:n]

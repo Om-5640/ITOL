@@ -144,18 +144,24 @@ def score_rag(
     response_itol: str,
     response_baseline: str,
     gold_answer: Optional[str],
+    provider: str = "",
 ) -> tuple[float, str]:
     """
     RAG quality: EM + F1 on gold (if available); otherwise Jaccard parity.
     Returns (score, method_name).
+
+    When provider=="mock" the responses are generic placeholders — scoring
+    against the gold answer always yields 0.  Instead, use response-pair
+    parity (same metric as chat), which correctly gives ~1.0 when both
+    baseline and ITOL mock responses are drawn from the same pool.
     """
-    if gold_answer:
+    if gold_answer and provider != "mock":
         em = exact_match(response_itol, gold_answer)
         f1 = token_f1(response_itol, gold_answer)
         # Blend: prefer EM when it fires, F1 as fallback
         score = max(em, f1 * 0.9)
         return min(1.0, score), "em_f1"
-    # No gold: use parity against baseline
+    # No gold OR mock provider: use parity against baseline
     j = jaccard_parity(response_itol, response_baseline)
     lr = length_ratio_ok(response_itol, response_baseline)
     rm = refusal_match(response_itol, response_baseline)
@@ -209,13 +215,26 @@ def judge(
     gold_answer: Optional[str] = None,
     gold_entities: Optional[list[str]] = None,
     cache_hit: bool = False,
+    provider: str = "",
 ) -> tuple[float, str]:
     """
     Top-level quality judge dispatcher.
     Returns (score ∈ [0,1], method_name).
+
+    provider: when "mock", ALL workloads use response-pair parity (chat-style:
+    Jaccard + length ratio + refusal match) instead of correctness scoring
+    against gold answers/entities. Mock responses are generic placeholders —
+    the point of the mock provider is to exercise the pipeline, not to grade
+    model correctness. Scoring generic text against gold always yields 0.
     """
+    if provider == "mock":
+        # cache hits on mock FAQ should still register as exact parity
+        if workload == "faq" and cache_hit:
+            return score_faq(response_itol, response_baseline, cache_hit=True)
+        return score_chat(response_itol, response_baseline)
+
     if workload == "rag":
-        return score_rag(response_itol, response_baseline, gold_answer)
+        return score_rag(response_itol, response_baseline, gold_answer, provider=provider)
     elif workload == "agent":
         return score_agent(response_itol, response_baseline, gold_entities)
     elif workload == "chat":
@@ -252,16 +271,21 @@ async def llm_judge(
     provider_name: str = "groq",
     model: str = "llama-3.1-8b-instant",
     api_key: Optional[str] = None,
+    base_url: str = "https://api.groq.com/openai/v1",
 ) -> tuple[float, str]:
     """
-    Use a small free LLM as a tiebreaker judge.
-    Returns (1.0 if not worse, 0.0 if worse), method="llm_judge".
-    Only called when deterministic score is in ambiguous range [0.85, 0.95].
+    Use an LLM as a semantic parity judge.
+    Returns (1.0 if not materially worse, 0.0 if worse), method="llm_judge".
+
+    base_url lets the caller route the judge to whichever provider has quota
+    (e.g. the provider under test) instead of always hitting Groq — important
+    when Groq's free tier is exhausted, which would otherwise return the neutral
+    0.90 fallback and silently pollute parity numbers.
     """
     import os
     key = api_key or os.environ.get("GROQ_API_KEY")
     if not key:
-        logger.debug("LLM judge skipped: no GROQ_API_KEY")
+        logger.debug("LLM judge skipped: no API key")
         return 0.90, "llm_judge_skipped"
 
     prompt = _LLM_JUDGE_PROMPT.format(
@@ -274,7 +298,7 @@ async def llm_judge(
         import httpx
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(
-                "https://api.groq.com/openai/v1/chat/completions",
+                f"{base_url}/chat/completions",
                 headers={"Authorization": f"Bearer {key}"},
                 json={
                     "model": model,
@@ -284,6 +308,7 @@ async def llm_judge(
                 },
             )
         if resp.status_code != 200:
+            logger.debug("LLM judge HTTP %s: %s", resp.status_code, resp.text[:160])
             return 0.90, "llm_judge_error"
         answer = resp.json()["choices"][0]["message"]["content"].strip().upper()
         score = 0.0 if answer.startswith("YES") else 1.0

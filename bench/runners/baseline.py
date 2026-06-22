@@ -23,11 +23,21 @@ from pathlib import Path
 from typing import Any, Optional
 
 from bench.config import ProviderConfig, BenchConfig
-from bench.metrics import BenchResult, append_result, completed_ids, result_path
+from bench.metrics import BenchResult, append_result, successful_ids, result_path
 from bench.rate_limit import call_with_retry
 from bench.workloads import WorkloadSample
 
 logger = logging.getLogger(__name__)
+
+# Providers whose OpenAI-compatible endpoint accepts the `seed` parameter.
+# Mistral and others reject unknown params (HTTP 422 extra_forbidden), so we
+# only send `seed` where it is supported and rely on temperature=0 otherwise.
+_SEED_SUPPORTED = {"groq", "openai", "deepseek", "openrouter"}
+
+
+def _seed_for(provider_name: str, seed: int) -> Optional[int]:
+    return seed if provider_name in _SEED_SUPPORTED else None
+
 
 # ---------------------------------------------------------------------------
 # HTTP dispatch helpers
@@ -208,7 +218,8 @@ async def _run_one_baseline(
             latency_ms = (time.perf_counter() - t_start) * 1000
         else:
             # OpenAI-compatible (Groq, Mistral)
-            body = _build_openai_body(sample, provider.model, config.temperature, config.seed)
+            body = _build_openai_body(sample, provider.model, config.temperature,
+                                      _seed_for(provider.name, config.seed))
             url = f"{provider.base_url}{provider.chat_path}"
 
             async def do_openai():
@@ -272,12 +283,13 @@ async def run_baseline(
     """
     date_str = datetime.now(timezone.utc).strftime("%Y%m%d")
     out_path = result_path(workload, provider.name, date_str, config.output_dir)
-    done_ids = completed_ids(out_path) if config.resume else set()
+    # Resume skips only SUCCESSFUL samples — errored ones get retried.
+    done_ids = successful_ids(out_path) if config.resume else set()
 
     results = []
     for i, sample in enumerate(samples):
         if sample.sample_id in done_ids:
-            logger.debug("Skipping %s (already done)", sample.sample_id)
+            logger.debug("Skipping %s (already succeeded)", sample.sample_id)
             continue
 
         logger.info("[baseline/%s/%s] %d/%d sample=%s",
