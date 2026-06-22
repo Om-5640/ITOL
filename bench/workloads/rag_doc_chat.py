@@ -138,12 +138,15 @@ def _warmup_answer(ex: dict) -> str:
 
 
 def _followup_question(ex: dict) -> str:
-    """Turn 2: ask about the first supporting entity (never 'yes'/'no')."""
+    """Turn 2: use corpus turn_questions[1] when available, else fallback."""
+    turn_questions = ex.get("turn_questions", [])
+    if len(turn_questions) > 1 and turn_questions[1]:
+        return turn_questions[1]
+    # Fallback for examples without pre-computed turn_questions
     supporting = ex.get("supporting_titles", [])
     if supporting:
         entity = supporting[0]
     else:
-        # fallback: use the answer if it's not a yes/no
         ans = ex.get("answer", "")
         entity = ans if len(ans.split()) > 1 else ex["question"].split()[-1]
     return f"Tell me more about {entity} based on the provided documents."
